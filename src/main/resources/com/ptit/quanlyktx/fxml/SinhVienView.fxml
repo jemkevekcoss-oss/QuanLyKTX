@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.ptit.quanlyktx.controller.SinhVienController"
+      spacing="17" fillWidth="true">
+    <VBox spacing="8" styleClass="content-panel">
+        <Label text="Danh sách sinh viên nội trú" styleClass="section-title" />
+        <Label text="Danh sách sinh viên từ cơ sở dữ liệu MySQL" style="-fx-text-fill: #64748B; -fx-font-size: 12px;" />
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <TextField fx:id="txtSearch" promptText="Tìm theo mã SV, tên, lớp, quê quán hoặc phòng..."
+                       HBox.hgrow="ALWAYS" prefHeight="39" />
+            <Button text="Thêm sinh viên" onAction="#handleAdd" styleClass="primary-button" />
+            <Button text="Sửa" onAction="#handleEdit" />
+            <Button text="Xóa" onAction="#handleDelete" />
+            <Button text="Làm mới" onAction="#handleRefresh" />
+        </HBox>
+        <TableView fx:id="tableStudents"
+                   VBox.vgrow="ALWAYS"
+                   prefHeight="490">
+            <placeholder>
+                <Label text="Không có sinh viên phù hợp" />
+            </placeholder>
+            <columns>
+                <TableColumn fx:id="colMaSV" text="Mã sinh viên" prefWidth="115" />
+                <TableColumn fx:id="colHoTen" text="Họ và tên" prefWidth="185" />
+                <TableColumn fx:id="colSoCmt" text="Số CMT/CCCD" prefWidth="140" />
+                <TableColumn fx:id="colLop" text="Lớp" prefWidth="115" />
+                <TableColumn fx:id="colQueQuan" text="Quê quán" prefWidth="145" />
+                <TableColumn fx:id="colSoPhong" text="Phòng" prefWidth="80" />
+                <TableColumn fx:id="colNgayVaoO" text="Ngày vào ở" prefWidth="105" />
+            </columns>
+        </TableView>
+        <Label fx:id="lblCount" text="Tổng: 0 sinh viên" style="-fx-text-fill: #64748B;" />
+    </VBox>
+</VBox>

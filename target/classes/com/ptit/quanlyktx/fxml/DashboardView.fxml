@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.ptit.quanlyktx.controller.DashboardController"
+      spacing="28" fillWidth="true">
+
+    <HBox spacing="16" fillHeight="true">
+        <VBox spacing="14" HBox.hgrow="ALWAYS" maxWidth="1.7976931348623157E308"
+              styleClass="stat-card">
+            <Label text="Tổng sinh viên" styleClass="card-label"/>
+            <Label fx:id="studentCount" text="—" styleClass="card-number"/>
+        </VBox>
+        <VBox spacing="14" HBox.hgrow="ALWAYS" maxWidth="1.7976931348623157E308"
+              styleClass="stat-card">
+            <Label text="Tổng số phòng" styleClass="card-label"/>
+            <Label fx:id="roomCount" text="—" styleClass="card-number"/>
+        </VBox>
+        <VBox spacing="14" HBox.hgrow="ALWAYS" maxWidth="1.7976931348623157E308"
+              styleClass="stat-card">
+            <Label text="Dịch vụ" styleClass="card-label"/>
+            <Label fx:id="serviceCount" text="—" styleClass="card-number"/>
+        </VBox>
+        <VBox spacing="14" HBox.hgrow="ALWAYS" maxWidth="1.7976931348623157E308"
+              styleClass="stat-card">
+            <Label text="Vé xe tháng" styleClass="card-label"/>
+            <Label fx:id="parkingCount" text="—" styleClass="card-number"/>
+        </VBox>
+    </HBox>
+
+    <VBox spacing="20" styleClass="content-panel">
+        <Label text="Truy cập nhanh" styleClass="section-title"/>
+        <HBox spacing="14">
+            <Button text="Tính tiền tháng" styleClass="primary-button" onAction="#handleBills"/>
+            <Button text="Xem thống kê" styleClass="primary-button" onAction="#handleReports"/>
+        </HBox>
+    </VBox>
+</VBox>
