@@ -57,8 +57,7 @@ public class SinhVienController {
 //                    "D22CQCN03", "Thanh Hóa", "P101", LocalDate.of(2026, 8, 28))
 //        );
         
-        
-
+       
         filtered = new FilteredList<>(danhSach, sv -> true);
         tableStudents.setItems(filtered);
         txtSearch.textProperty().addListener(
@@ -73,28 +72,26 @@ public class SinhVienController {
         loadFromDatabase();
     }
     
-    private void loadFromDatabase() {
+    private boolean loadFromDatabase() {
+    try {
+        // Đọc dữ liệu mới nhất từ MySQL
+        danhSach.setAll(sinhVienDAO.findAll());
 
-        try {
-            // Đọc danh sách sinh viên từ MySQL
-            danhSach.setAll(sinhVienDAO.findAll());
+        // Cập nhật số lượng sinh viên
+        updateCount();
 
-            updateCount();
+        // Tải thành công
+        return true;
 
-        } catch (SQLException e) {
+    } catch (SQLException e) {
 
-            danhSach.clear();
+        // Thông báo lỗi, giữ nguyên danh sách đang hiển thị
+        showDatabaseError("Không thể tải danh sách sinh viên", e);
 
-            Alert alert = new Alert(
-                    Alert.AlertType.ERROR,
-                    "Không đọc được dữ liệu MySQL:\n" + e.getMessage(),
-                    ButtonType.OK
-            );
-
-            alert.setTitle("Lỗi cơ sở dữ liệu");
-            alert.showAndWait();
-        }                                           
+        // Tải thất bại
+        return false;
     }
+}
     
     private ReadOnlyStringWrapper str(String text) {
         return new ReadOnlyStringWrapper(text == null ? "" : text);
@@ -119,31 +116,104 @@ public class SinhVienController {
         );
     }
 
-    @FXML private void handleAdd() {
+    @FXML
+    private void handleAdd() {
         showForm(null).ifPresent(sv -> {
-            danhSach.add(sv);
-            tableStudents.getSelectionModel().select(sv);
-        });
+            try {
+                // Thêm sinh viên vào MySQL
+                boolean success = sinhVienDAO.insert(sv);
+
+                if (success) {
+                    // Tải lại danh sách từ MySQL
+                    if (loadFromDatabase()) {
+                        // Chọn sinh viên vừa thêm
+                        selectStudent(sv.getMaSV());
+                    }
+
+                    info("Thêm sinh viên thành công!");
+                } else {
+                    warn("Không thể thêm sinh viên.");
+                }
+
+            } catch (SQLException e) {
+                showDatabaseError("Không thể thêm sinh viên", e);
+            }
+        });  
     }
 
-    @FXML private void handleEdit() {
+    @FXML
+    private void handleEdit() {
         SinhVien current = tableStudents.getSelectionModel().getSelectedItem();
-        if (current == null) { warn("Hãy chọn một sinh viên trong bảng để sửa."); return; }
+
+        if (current == null) {
+            warn("Hãy chọn một sinh viên trong bảng để sửa.");
+            return;
+        }
+
         showForm(current).ifPresent(updated -> {
-            int index = danhSach.indexOf(current);
-            if (index >= 0) danhSach.set(index, updated);
-            tableStudents.getSelectionModel().select(updated);
+            try {
+                // Cập nhật thông tin sinh viên trong MySQL
+                boolean success = sinhVienDAO.update(updated);
+
+                if (success) {
+                    // Tải lại danh sách từ MySQL
+                    if (loadFromDatabase()) {
+                        // Chọn lại sinh viên vừa sửa
+                        selectStudent(updated.getMaSV());
+                    }
+
+                    info("Cập nhật thông tin sinh viên thành công!");
+                } else {
+                    warn("Không tìm thấy sinh viên cần cập nhật trong MySQL.");
+                }
+
+            } catch (SQLException e) {
+                showDatabaseError("Không thể cập nhật sinh viên", e);
+            }
         });
     }
 
-    @FXML private void handleDelete() {
+    @FXML
+    private void handleDelete() {
         SinhVien current = tableStudents.getSelectionModel().getSelectedItem();
-        if (current == null) { warn("Hãy chọn một sinh viên trong bảng để xóa."); return; }
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                "Xóa sinh viên " + current.getHoTen() + " (" + current.getMaSV() + ") khỏi dữ liệu mẫu?",
-                ButtonType.YES, ButtonType.NO);
+
+        if (current == null) {
+            warn("Hãy chọn một sinh viên trong bảng để xóa.");
+            return;
+        }
+
+        // Yêu cầu xác nhận trước khi xóa
+        Alert confirm = new Alert(
+                Alert.AlertType.CONFIRMATION,
+                "Bạn có chắc chắn muốn xóa sinh viên "
+                        + current.getHoTen()
+                        + " (" + current.getMaSV() + ") khỏi cơ sở dữ liệu?",
+                ButtonType.YES,
+                ButtonType.NO
+        );
+
         confirm.setTitle("Xác nhận xóa");
-        if (confirm.showAndWait().orElse(ButtonType.NO) == ButtonType.YES) danhSach.remove(current);
+
+        if (confirm.showAndWait().orElse(ButtonType.NO) != ButtonType.YES) {
+            return;
+        }
+
+        try {
+            // Xóa sinh viên trong MySQL theo mã sinh viên
+            boolean success = sinhVienDAO.delete(current.getMaSV());
+
+            if (success) {
+                // Tải lại danh sách sau khi xóa
+                loadFromDatabase();
+
+                info("Xóa sinh viên thành công!");
+            } else {
+                warn("Không tìm thấy sinh viên cần xóa trong MySQL.");
+            }
+
+        } catch (SQLException e) {
+            showDatabaseError("Không thể xóa sinh viên", e);
+        }
     }
 
     @FXML
@@ -231,4 +301,59 @@ public class SinhVienController {
         alert.setTitle("Quản lý sinh viên");
         alert.showAndWait();
     }
+    
+    //Thông báo thành công
+    private void info(String message) {
+        Alert alert = new Alert(
+                Alert.AlertType.INFORMATION,
+                message,
+                ButtonType.OK
+        );
+
+        alert.setTitle("Quản lý sinh viên");
+        alert.showAndWait();
+    }
+    //Thông báo lỗi MySQL
+    private void showDatabaseError(String action, SQLException e) {
+
+        String detail;
+
+        switch (e.getErrorCode()) {
+            case 1062 ->
+                detail = "Mã sinh viên hoặc số CMT/CCCD đã tồn tại.";
+
+            case 1452 ->
+                detail = "Dữ liệu tham chiếu không hợp lệ. "
+                       + "Hãy kiểm tra số phòng.";
+
+            case 1451 ->
+                detail = "Không thể xóa hoặc thay đổi dữ liệu "
+                       + "vì đang có bản ghi liên quan.";
+
+            default ->
+                detail = "Lỗi MySQL: " + e.getMessage();
+        }
+
+        Alert alert = new Alert(
+                Alert.AlertType.ERROR,
+                action + ".\n" + detail,
+                ButtonType.OK
+        );
+
+        alert.setTitle("Lỗi cơ sở dữ liệu");
+        alert.showAndWait();
+    }
+    //Chọn lại sinh viên sau khi tải dữ liệu
+    private void selectStudent(String maSV) {
+
+        for (SinhVien sv : filtered) {
+
+            if (sv.getMaSV().equals(maSV)) {
+                tableStudents.getSelectionModel().select(sv);
+                tableStudents.scrollTo(sv);
+                break;
+            }
+        }
+    }  
+    
 }

@@ -12,8 +12,8 @@ public class App extends Application {
         Scene scene = new Scene(loader.load(), 1150, 720);
         scene.getStylesheets().add(App.class.getResource("/com/ptit/quanlyktx/css/style.css").toExternalForm());
         stage.setTitle("PTIT KTX | Quản lý ký túc xá");
-        stage.setMinWidth(950);
-        stage.setMinHeight(600);
+        stage.setMinWidth(1300);
+        stage.setMinHeight(800);
         stage.setScene(scene);
         stage.show();
     }
