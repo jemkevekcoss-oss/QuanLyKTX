@@ -27,7 +27,7 @@ public class SinhVienDAO {
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql);
              ResultSet rs = statement.executeQuery()) {
-
+                    
             while (rs.next()) {
                 result.add(new SinhVien(
                     rs.getString("ma_sv"),
@@ -43,8 +43,80 @@ public class SinhVienDAO {
         }
         return result;
     }
+    
+    //INSERT
+    public boolean insert(SinhVien sv) throws SQLException {
 
+        String sql = """
+            INSERT INTO SINH_VIEN
+            (ma_sv, so_cmt, ho_ten, ngay_sinh,
+             lop, que_quan, so_phong, ngay_vao_o)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """;
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, sv.getMaSV());
+            ps.setString(2, sv.getSoCmt());
+            ps.setString(3, sv.getHoTen());
+            ps.setDate(4, Date.valueOf(sv.getNgaySinh()));
+            ps.setString(5, sv.getLop());
+            ps.setString(6, sv.getQueQuan());
+            ps.setString(7, sv.getSoPhong());
+            ps.setDate(8, Date.valueOf(sv.getNgayVaoO()));
+
+            return ps.executeUpdate() == 1;
+        }
+        
+    } 
+    //UPDATE
+    public boolean update(SinhVien sv) throws SQLException {
+        String sql = """
+            UPDATE SINH_VIEN
+            SET so_cmt = ?,
+                ho_ten = ?,
+                ngay_sinh = ?,
+                lop = ?,
+                que_quan = ?,
+                so_phong = ?,
+                ngay_vao_o = ?
+            WHERE ma_sv = ?
+            """;
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, sv.getSoCmt());
+            ps.setString(2, sv.getHoTen());
+            ps.setDate(3, Date.valueOf(sv.getNgaySinh()));
+            ps.setString(4, sv.getLop());
+            ps.setString(5, sv.getQueQuan());
+            ps.setString(6, sv.getSoPhong());
+            ps.setDate(7, Date.valueOf(sv.getNgayVaoO()));
+            ps.setString(8, sv.getMaSV());
+
+            return ps.executeUpdate() == 1;
+        }
+    }   
+    //DELETE
+    public boolean delete(String maSV) throws SQLException {
+        String sql = """
+            DELETE FROM SINH_VIEN
+            WHERE ma_sv = ?
+            """;
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, maSV);
+
+            return ps.executeUpdate() == 1;
+        }
+    } 
+    
     private static LocalDate asLocalDate(Date value) {
         return value == null ? null : value.toLocalDate();
     }
+    
 }
