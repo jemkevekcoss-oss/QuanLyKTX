@@ -104,8 +104,12 @@ public class MainController {
         loadPage("PhongView.fxml", "Quản lý phòng ở");
     }
 
-    @FXML private void showVisitors() {
-        showPlaceholder("Quản lý khách thăm", "Ghi nhận khách đến và thống kê theo tuần hoặc tháng.");
+//    @FXML private void showVisitors() {
+//        showPlaceholder("Quản lý khách thăm", "Ghi nhận khách đến và thống kê theo tuần hoặc tháng.");
+//    }
+    @FXML
+    private void showVisitors() {
+        loadPage("KhachThamView.fxml", "Quản lý khách thăm");
     }
 
     @FXML private void showServices() {

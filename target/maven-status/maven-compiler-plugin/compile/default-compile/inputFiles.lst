@@ -1,13 +1,17 @@
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\App.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\controller\DashboardController.java
+C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\controller\KhachThamController.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\controller\MainController.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\controller\PhongController.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\controller\SinhVienController.java
+C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\dao\KhachThamDAO.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\dao\PhongDAO.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\dao\SinhVienDAO.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\database\DatabaseConnection.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\database\TestConnection.java
+C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\dto\KhachThamRow.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\dto\PhongThongKe.java
+C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\dto\ThongKeLuotTham.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\model\DichVu.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\model\KhachTham.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\model\LuotGuiXe.java

@@ -1,0 +1,67 @@
+/* Rieng trang Khach tham; khong can sua style.css da co */
+.visitor-page {
+    -fx-background-color: transparent;
+    -fx-font-family: "Segoe UI", "Arial";
+}
+.visitor-stat-card, .visitor-panel {
+    -fx-background-color: white;
+    -fx-background-radius: 11;
+    -fx-border-color: #DFE7F1;
+    -fx-border-radius: 11;
+    -fx-border-width: 1;
+}
+.visitor-stat-card { -fx-padding: 16 18; -fx-min-height: 85; }
+.visitor-panel { -fx-padding: 16 18; }
+.visitor-caption { -fx-text-fill: #59728D; -fx-font-size: 12px; }
+.visitor-stat-value { -fx-text-fill: #1C60D1; -fx-font-weight: bold; -fx-font-size: 25px; }
+.visitor-title { -fx-text-fill: #132941; -fx-font-weight: bold; -fx-font-size: 17px; }
+.visitor-count { -fx-text-fill: #6C829E; -fx-font-size: 11px; }
+.visitor-detail { -fx-text-fill: #38516E; -fx-font-size: 12px; }
+.visitor-primary-button {
+    -fx-background-color: #2465E8;
+    -fx-text-fill: white;
+    -fx-background-radius: 6;
+    -fx-padding: 9 13;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+.visitor-primary-button:hover { -fx-background-color: #1958D0; }
+.visitor-normal-button {
+    -fx-background-color: #F8FAFE;
+    -fx-text-fill: #223B59;
+    -fx-background-radius: 6;
+    -fx-border-color: #CBD6E6;
+    -fx-border-radius: 6;
+    -fx-padding: 9 12;
+    -fx-cursor: hand;
+}
+.visitor-normal-button:hover { -fx-background-color: #E8F1FF; }
+.visitor-page .text-field, .visitor-page .combo-box {
+    -fx-background-color: white;
+    -fx-background-radius: 6;
+    -fx-border-color: #CBD6E6;
+    -fx-border-radius: 6;
+}
+.visitor-page .text-field:focused, .visitor-page .combo-box:focused {
+    -fx-border-color: #2465E8;
+}
+.visitor-table { -fx-background-color: white; -fx-border-color: #D8E2EE; }
+.visitor-table .column-header-background { -fx-background-color: #EAF1FB; }
+.visitor-table .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent #DEE6F0 transparent transparent;
+}
+.visitor-table .column-header .label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #183251;
+    -fx-font-weight: bold;
+}
+.visitor-table .table-cell {
+    -fx-font-size: 12px;
+    -fx-text-fill: #213C5B;
+    -fx-padding: 6 8;
+}
+.visitor-table .table-row-cell:odd { -fx-background-color: #F8FAFE; }
+.visitor-table .table-row-cell:even { -fx-background-color: white; }
+.visitor-table .table-row-cell:selected { -fx-background-color: #D7E8FF; }
+.visitor-table .table-row-cell:selected .table-cell { -fx-text-fill: #123B76; }

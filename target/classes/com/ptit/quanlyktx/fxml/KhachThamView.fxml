@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.ptit.quanlyktx.controller.KhachThamController"
+      stylesheets="@../css/khachtham.css"
+      styleClass="visitor-page" spacing="12" fillWidth="true">
+
+    <!-- Thong ke thuc te tu bang KHACH_THAM -->
+    <HBox spacing="12" fillHeight="true">
+        <VBox spacing="5" styleClass="visitor-stat-card"
+              HBox.hgrow="ALWAYS" maxWidth="1.7976931348623157E308">
+            <Label text="Tổng lượt khách" styleClass="visitor-caption"/>
+            <Label fx:id="lblTotalVisits" text="—" styleClass="visitor-stat-value"/>
+        </VBox>
+        <VBox spacing="5" styleClass="visitor-stat-card"
+              HBox.hgrow="ALWAYS" maxWidth="1.7976931348623157E308">
+            <Label text="Lượt đến tháng này" styleClass="visitor-caption"/>
+            <Label fx:id="lblMonthVisits" text="—" styleClass="visitor-stat-value"/>
+        </VBox>
+        <VBox spacing="5" styleClass="visitor-stat-card"
+              HBox.hgrow="ALWAYS" maxWidth="1.7976931348623157E308">
+            <Label text="Khách khác nhau tháng này" styleClass="visitor-caption"/>
+            <Label fx:id="lblUniqueGuests" text="—" styleClass="visitor-stat-value"/>
+        </VBox>
+    </HBox>
+
+    <VBox spacing="10" styleClass="visitor-panel">
+        <Label text="Danh sách lượt khách đến thăm" styleClass="visitor-title"/>
+        <Label text="Mỗi dòng là một lượt thăm. Một khách có thể đến nhiều lần."
+               styleClass="visitor-count"/>
+        <HBox spacing="9" alignment="CENTER_LEFT">
+            <TextField fx:id="txtSearch" prefHeight="37"
+                       promptText="Tìm CCCD, tên khách, mã/tên SV, phòng..."
+                       HBox.hgrow="ALWAYS"/>
+            <ComboBox fx:id="cbPeriod" prefWidth="148" prefHeight="37"/>
+            <Button text="+ Ghi nhận khách" onAction="#handleAdd" styleClass="visitor-primary-button"/>
+            <Button text="Sửa" onAction="#handleEdit" styleClass="visitor-normal-button"/>
+            <Button text="Xóa" onAction="#handleDelete" styleClass="visitor-normal-button"/>
+            <Button text="Làm mới" onAction="#handleRefresh" styleClass="visitor-normal-button"/>
+        </HBox>
+        <TableView fx:id="tableVisits" prefHeight="375" VBox.vgrow="ALWAYS"
+                   styleClass="visitor-table">
+            <placeholder><Label text="Không có lượt khách phù hợp"/></placeholder>
+            <columns>
+                <TableColumn fx:id="colId" text="ID lượt" prefWidth="73"/>
+                <TableColumn fx:id="colGuestName" text="Họ tên khách" prefWidth="160"/>
+                <TableColumn fx:id="colGuestId" text="CMT/CCCD" prefWidth="140"/>
+                <TableColumn fx:id="colBirth" text="Ngày sinh" prefWidth="104"/>
+                <TableColumn fx:id="colVisitDate" text="Ngày đến" prefWidth="106"/>
+                <TableColumn fx:id="colStudentId" text="Mã sinh viên" prefWidth="134"/>
+                <TableColumn fx:id="colStudentName" text="Sinh viên được thăm" prefWidth="171"/>
+                <TableColumn fx:id="colRoom" text="Phòng" prefWidth="78"/>
+            </columns>
+        </TableView>
+        <Label fx:id="lblCount" text="Hiển thị: 0 lượt" styleClass="visitor-count"/>
+    </VBox>
+
+    <VBox spacing="5" styleClass="visitor-panel">
+        <Label text="Thông tin lượt thăm được chọn" styleClass="visitor-title"/>
+        <Label fx:id="lblSelected" text="Chọn một lượt khách trong bảng để xem tóm tắt."
+               styleClass="visitor-detail" wrapText="true"/>
+    </VBox>
+</VBox>
