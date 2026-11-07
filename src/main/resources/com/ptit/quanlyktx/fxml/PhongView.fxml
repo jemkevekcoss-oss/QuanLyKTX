@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.VBox?>
+
+<!-- Màn hình này được nạp vào contentArea trong MainView.fxml. Sidebar dùng lại. -->
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.ptit.quanlyktx.controller.PhongController"
+      stylesheets="@../css/phong.css"
+      styleClass="room-page" spacing="12" fillWidth="true">
+
+    <!-- Ba thẻ thống kê, tính trực tiếp từ dữ liệu MySQL -->
+    <HBox spacing="12" fillHeight="true">
+        <VBox spacing="5" styleClass="room-stat-card"
+              HBox.hgrow="ALWAYS" maxWidth="1.7976931348623157E308">
+            <Label text="Tổng số phòng" styleClass="room-stat-caption"/>
+            <Label fx:id="lblTotalRooms" text="—" styleClass="room-stat-number"/>
+        </VBox>
+        <VBox spacing="5" styleClass="room-stat-card"
+              HBox.hgrow="ALWAYS" maxWidth="1.7976931348623157E308">
+            <Label text="Đang sử dụng" styleClass="room-stat-caption"/>
+            <Label fx:id="lblOccupiedRooms" text="—" styleClass="room-stat-number"/>
+        </VBox>
+        <VBox spacing="5" styleClass="room-stat-card"
+              HBox.hgrow="ALWAYS" maxWidth="1.7976931348623157E308">
+            <Label text="Chỗ còn trống" styleClass="room-stat-caption"/>
+            <Label fx:id="lblEmptyBeds" text="—" styleClass="room-stat-number"/>
+        </VBox>
+    </HBox>
+
+    <!-- Danh sách phòng và thanh công cụ -->
+    <VBox spacing="10" styleClass="room-panel">
+        <Label text="Danh sách phòng ký túc xá" styleClass="room-panel-title"/>
+        <HBox spacing="9" alignment="CENTER_LEFT">
+            <TextField fx:id="txtSearch"
+                       promptText="Tìm số phòng hoặc loại phòng..."
+                       prefHeight="36" HBox.hgrow="ALWAYS"/>
+            <ComboBox fx:id="cbStatus" prefWidth="142" prefHeight="36"/>
+            <Button text="+ Thêm phòng" onAction="#handleAdd" styleClass="room-primary-button"/>
+            <Button text="Sửa" onAction="#handleEdit" styleClass="room-normal-button"/>
+            <Button text="Xóa" onAction="#handleDelete" styleClass="room-normal-button"/>
+            <Button text="Làm mới" onAction="#handleRefresh" styleClass="room-normal-button"/>
+        </HBox>
+        <TableView fx:id="tableRooms" prefHeight="290" VBox.vgrow="ALWAYS"
+                   styleClass="room-table">
+            <placeholder><Label text="Không tìm thấy phòng phù hợp"/></placeholder>
+            <columns>
+                <TableColumn fx:id="colSoPhong" text="Số phòng" prefWidth="97"/>
+                <TableColumn fx:id="colLoaiPhong" text="Loại phòng" prefWidth="220"/>
+                <TableColumn fx:id="colDonGia" text="Đơn giá" prefWidth="137"/>
+                <TableColumn fx:id="colSucChua" text="Sức chứa" prefWidth="93"/>
+                <TableColumn fx:id="colDangO" text="Đang ở" prefWidth="85"/>
+                <TableColumn fx:id="colConTrong" text="Còn trống" prefWidth="97"/>
+                <TableColumn fx:id="colTrangThai" text="Trạng thái" prefWidth="114"/>
+            </columns>
+        </TableView>
+        <Label fx:id="lblRoomCount" text="Hiển thị: 0 phòng" styleClass="room-count"/>
+    </VBox>
+
+    <!-- Danh sách SV theo phòng đang chọn, liên kết dữ liệu thực MySQL -->
+    <VBox spacing="10" styleClass="room-panel">
+        <HBox alignment="CENTER_LEFT">
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <Label fx:id="lblRoomDetail" text="Sinh viên trong phòng" styleClass="room-panel-title"/>
+                <Label fx:id="lblRoomDetailSub" text="Chọn phòng ở bảng trên" styleClass="room-count"/>
+            </VBox>
+            <Button text="Xem chi tiết" onAction="#handleRoomDetails" styleClass="room-link-button"/>
+        </HBox>
+        <TableView fx:id="tableStudents" prefHeight="152" styleClass="room-table">
+            <placeholder><Label text="Phòng chưa có sinh viên"/></placeholder>
+            <columns>
+                <TableColumn fx:id="colStudentNo" text="STT" prefWidth="62"/>
+                <TableColumn fx:id="colStudentName" text="Họ và tên" prefWidth="235"/>
+                <TableColumn fx:id="colStudentId" text="Mã sinh viên" prefWidth="150"/>
+                <TableColumn fx:id="colStudentClass" text="Lớp" prefWidth="150"/>
+                <TableColumn fx:id="colStudentMoveIn" text="Ngày vào ở" prefWidth="140"/>
+            </columns>
+        </TableView>
+    </VBox>
+</VBox>

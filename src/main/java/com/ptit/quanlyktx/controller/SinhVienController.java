@@ -47,15 +47,6 @@ public class SinhVienController {
         colNgayVaoO.setCellValueFactory(c -> str(
                 c.getValue().getNgayVaoO() == null ? "" : c.getValue().getNgayVaoO().toString()));
 
-        // Dữ liệu HƯ CẤU chỉ để thử giao diện, KHÔNG phải dữ liệu MySQL.
-//        danhSach.addAll(
-//            new SinhVien("SV001", "001234567890", "Nguyễn Văn An", LocalDate.of(2005, 3, 14),
-//                    "D23CQCN01", "Hà Nội", "P101", LocalDate.of(2026, 9, 1)),
-//            new SinhVien("SV002", "001234567891", "Trần Thị Bình", LocalDate.of(2005, 8, 20),
-//                    "D23CQCN02", "Nam Định", "P102", LocalDate.of(2026, 9, 2)),
-//            new SinhVien("SV003", "001234567892", "Lê Minh Cường", LocalDate.of(2004, 12, 3),
-//                    "D22CQCN03", "Thanh Hóa", "P101", LocalDate.of(2026, 8, 28))
-//        );
         
        
         filtered = new FilteredList<>(danhSach, sv -> true);

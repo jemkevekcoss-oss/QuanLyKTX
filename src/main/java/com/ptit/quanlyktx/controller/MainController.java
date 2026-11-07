@@ -96,8 +96,12 @@ public class MainController {
         loadPage("SinhVienView.fxml", "Quản lý sinh viên");
     }
 
-    @FXML private void showRooms() {
-        showPlaceholder("Quản lý phòng ở", "Danh sách phòng, sức chứa, đơn giá và kiểm tra số chỗ còn trống.");
+//    @FXML private void showRooms() {
+//        showPlaceholder("Quản lý phòng ở", "Danh sách phòng, sức chứa, đơn giá và kiểm tra số chỗ còn trống.");
+//    }
+    @FXML
+    private void showRooms() {
+        loadPage("PhongView.fxml", "Quản lý phòng ở");
     }
 
     @FXML private void showVisitors() {

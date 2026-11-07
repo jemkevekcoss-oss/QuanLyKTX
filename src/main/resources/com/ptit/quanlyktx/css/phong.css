@@ -1,0 +1,59 @@
+/* CSS độc lập cho màn Phòng ở: không đụng tới style.css đang dùng cho các trang khác. */
+.room-page {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-font-family: "Segoe UI", "Arial";
+}
+.room-stat-card, .room-panel {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-border-color: #DFE7F1;
+    -fx-border-radius: 10;
+    -fx-border-width: 1;
+}
+.room-stat-card { -fx-padding: 15 18; -fx-min-height: 82; }
+.room-panel { -fx-padding: 15 17; }
+.room-stat-caption { -fx-text-fill: #5C7393; -fx-font-size: 12px; }
+.room-stat-number { -fx-font-size: 25px; -fx-font-weight: bold; -fx-text-fill: #155DCF; }
+.room-panel-title { -fx-font-size: 17px; -fx-font-weight: bold; -fx-text-fill: #132943; }
+.room-count { -fx-font-size: 11px; -fx-text-fill: #6B7D95; }
+.room-primary-button {
+    -fx-background-color: #2465E8;
+    -fx-text-fill: white;
+    -fx-background-radius: 6;
+    -fx-font-weight: bold;
+    -fx-padding: 9 13;
+    -fx-cursor: hand;
+}
+.room-primary-button:hover { -fx-background-color: #1A53C5; }
+.room-normal-button, .room-link-button {
+    -fx-background-color: #F8FAFE;
+    -fx-text-fill: #223B59;
+    -fx-border-color: #CBD6E6;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 8 12;
+    -fx-cursor: hand;
+}
+.room-link-button { -fx-text-fill: #1F64D7; }
+.room-normal-button:hover, .room-link-button:hover { -fx-background-color: #E9F1FF; }
+.room-page .text-field, .room-page .combo-box {
+    -fx-background-color: white;
+    -fx-background-radius: 5;
+    -fx-border-color: #CBD6E6;
+    -fx-border-radius: 5;
+    -fx-prompt-text-fill: #96A3B4;
+}
+.room-page .text-field:focused, .room-page .combo-box:focused { -fx-border-color: #2563EB; }
+.room-table { -fx-border-color: #D7E1ED; -fx-border-width: 1; -fx-background-color: white; }
+.room-table .column-header-background { -fx-background-color: #EAF1FB; }
+.room-table .column-header { -fx-background-color: transparent; -fx-border-color: transparent #DEE6F0 transparent transparent; }
+.room-table .column-header .label { -fx-text-fill: #183251; -fx-font-size: 12px; -fx-font-weight: bold; }
+.room-table .table-cell { -fx-font-size: 12px; -fx-text-fill: #223953; -fx-padding: 6 8; }
+.room-table .table-row-cell:odd { -fx-background-color: #F8FAFE; }
+.room-table .table-row-cell:even { -fx-background-color: white; }
+.room-table .table-row-cell:selected { -fx-background-color: #D9E9FF; }
+.room-table .table-row-cell:selected .table-cell { -fx-text-fill: #123B76; }
+.room-badge-full { -fx-text-fill: #B42318; -fx-font-weight: bold; }
+.room-badge-open { -fx-text-fill: #16803C; -fx-font-weight: bold; }
+.room-badge-empty { -fx-text-fill: #687588; -fx-font-weight: bold; }
