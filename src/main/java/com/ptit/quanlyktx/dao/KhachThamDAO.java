@@ -24,8 +24,9 @@ public class KhachThamDAO {
                    s.ho_ten AS ten_sinh_vien, s.so_phong
             FROM KHACH_THAM k
             LEFT JOIN SINH_VIEN s ON s.ma_sv = k.ma_sv
-            ORDER BY k.ngay_den_choi DESC, k.id_khach DESC
+            ORDER BY k.id_khach ASC
             """;
+            //  ORDER BY k.ngay_den_choi DESC, k.id_khach DESC    
         List<KhachThamRow> result = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);

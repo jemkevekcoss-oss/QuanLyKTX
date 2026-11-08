@@ -31,7 +31,15 @@ public class MainController {
         try {
             FXMLLoader loader = new FXMLLoader(resource);
             Node view = loader.load();
-
+               
+            if (loader.getController() instanceof DichVuController dv) {
+            dv.setOnNavigate(page -> {
+                if ("reports".equals(page)) {
+                    showReports();
+                }
+            });
+}
+            
             // Cấp callback để nút truy cập nhanh ở Dashboard đổi màn hình.
             if (loader.getController() instanceof DashboardController dashboard) {
                 dashboard.setOnNavigate(this::navigateTo);
@@ -112,8 +120,12 @@ public class MainController {
         loadPage("KhachThamView.fxml", "Quản lý khách thăm");
     }
 
-    @FXML private void showServices() {
-        showPlaceholder("Quản lý dịch vụ", "Danh mục dịch vụ và lịch sử sử dụng của sinh viên.");
+//    @FXML private void showServices() {
+//        showPlaceholder("Quản lý dịch vụ", "Danh mục dịch vụ và lịch sử sử dụng của sinh viên.");
+//    }
+    @FXML
+    private void showServices() {
+        loadPage("DichVuView.fxml", "Quản lý dịch vụ");
     }
 
     @FXML private void showParking() {

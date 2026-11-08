@@ -1,0 +1,51 @@
+/* CSS riêng: ưu tiên trắng - xanh navy - xanh dương, không đụng giao diện các module khác. */
+.svc-page { -fx-background-color: transparent; -fx-font-family: "Segoe UI", "Arial"; }
+.svc-stat-card, .svc-panel {
+    -fx-background-color: white;
+    -fx-background-radius: 11;
+    -fx-border-color: #DFE7F1;
+    -fx-border-width: 1;
+    -fx-border-radius: 11;
+}
+.svc-stat-card { -fx-padding: 16 20; -fx-min-height: 92; }
+.svc-muted { -fx-text-fill: #5F7591; -fx-font-size: 12px; }
+.svc-stat-number { -fx-text-fill: #1759CB; -fx-font-size: 25px; -fx-font-weight: bold; }
+.svc-panel { -fx-padding: 17 18; }
+.svc-panel-title { -fx-text-fill: #152A43; -fx-font-size: 17px; -fx-font-weight: bold; }
+.svc-panel-subtitle { -fx-text-fill: #213C5E; -fx-font-size: 13px; -fx-font-weight: bold; }
+.svc-footnote { -fx-text-fill: #70839B; -fx-font-size: 11px; }
+.svc-report-total { -fx-text-fill: #0E7490; -fx-font-size: 13px; -fx-font-weight: bold; }
+.svc-primary-button {
+    -fx-background-color: #2465E8; -fx-text-fill: white; -fx-font-weight: bold;
+    -fx-padding: 9 15; -fx-background-radius: 6; -fx-cursor: hand;
+}
+.svc-primary-button:hover { -fx-background-color: #1A53C5; }
+.svc-button, .svc-link-button {
+    -fx-background-color: #F9FBFE; -fx-border-color: #CBD6E6; -fx-border-radius: 6;
+    -fx-background-radius: 6; -fx-padding: 8 12; -fx-text-fill: #213B5A; -fx-cursor: hand;
+}
+.svc-link-button { -fx-text-fill: #1859BD; -fx-font-weight: bold; }
+.svc-button:hover, .svc-link-button:hover { -fx-background-color: #EAF2FF; }
+.svc-page .text-field, .svc-page .date-picker {
+    -fx-border-color: #CDD8E8; -fx-border-width: 1; -fx-border-radius: 5;
+    -fx-background-color: white; -fx-background-radius: 5;
+}
+.svc-page .text-field:focused, .svc-page .date-picker:focused { -fx-border-color: #2470EA; }
+.svc-page .text-field { -fx-prompt-text-fill: #93A2B7; }
+.svc-tabs { -fx-background-color: transparent; }
+.svc-tabs > .tab-header-area > .tab-header-background { -fx-background-color: transparent; }
+.svc-tabs > .tab-header-area .tab { -fx-background-color: #ECF1F8; -fx-background-radius: 7 7 0 0; -fx-padding: 10 17; }
+.svc-tabs > .tab-header-area .tab:selected { -fx-background-color: #DDEBFF; }
+.svc-tabs > .tab-header-area .tab .tab-label { -fx-text-fill: #526A8A; -fx-font-size: 13px; -fx-font-weight: bold; }
+.svc-tabs > .tab-header-area .tab:selected .tab-label { -fx-text-fill: #1559C9; }
+.svc-tabs > .tab-header-area .focus-indicator { -fx-border-color: transparent; }
+.svc-tabs > .tab-content-area { -fx-background-color: transparent; }
+.svc-table { -fx-background-color: white; -fx-border-color: #D8E1EF; -fx-border-width: 1; }
+.svc-table .column-header-background { -fx-background-color: #E9F1FC; }
+.svc-table .column-header { -fx-background-color: transparent; -fx-border-color: transparent #DFE8F3 transparent transparent; }
+.svc-table .column-header .label { -fx-text-fill: #19334F; -fx-font-size: 12px; -fx-font-weight: bold; }
+.svc-table .table-row-cell:odd { -fx-background-color: #F8FAFE; }
+.svc-table .table-row-cell:even { -fx-background-color: white; }
+.svc-table .table-row-cell:selected { -fx-background-color: #D6E7FF; }
+.svc-table .table-row-cell:selected .table-cell { -fx-text-fill: #17437B; }
+.svc-table .table-cell { -fx-text-fill: #263F5A; -fx-font-size: 12px; -fx-padding: 7 8; }
