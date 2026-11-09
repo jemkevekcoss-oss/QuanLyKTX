@@ -1,6 +1,7 @@
 package com.ptit.quanlyktx.model;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 public class VeXeThang {
 
@@ -9,11 +10,12 @@ public class VeXeThang {
     private String loaiXe;
     private String maSV;
     private String thangDangKy;
+    private LocalDate ngayDangKy;
     private BigDecimal phiHangThang;
-
+    
     public VeXeThang() {
     }
-
+    //constructor01
     public VeXeThang(String maVeXe, String bienSoXe, String loaiXe, String maSV, String thangDangKy, BigDecimal phiHangThang) {
         this.maVeXe = maVeXe;
         this.bienSoXe = bienSoXe;
@@ -22,6 +24,16 @@ public class VeXeThang {
         this.thangDangKy = thangDangKy;
         this.phiHangThang = phiHangThang;
     }
+    //constructor02
+    public VeXeThang(String maVeXe, String bienSoXe,
+                     String loaiXe, String maSV,
+                     String thangDangKy, LocalDate ngayDangKy,
+                     BigDecimal phiHangThang) {
+        this(maVeXe, bienSoXe, loaiXe, maSV,
+             thangDangKy, phiHangThang);
+        this.ngayDangKy = ngayDangKy;
+    }
+    
 
     public String getMaVeXe() {
         return maVeXe;
@@ -62,7 +74,15 @@ public class VeXeThang {
     public void setThangDangKy(String thangDangKy) {
         this.thangDangKy = thangDangKy;
     }
+    
+    public LocalDate getNgayDangKy() {
+        return ngayDangKy;
+    }
 
+    public void setNgayDangKy(LocalDate ngayDangKy) {
+        this.ngayDangKy = ngayDangKy;
+    }
+    
     public BigDecimal getPhiHangThang() {
         return phiHangThang;
     }

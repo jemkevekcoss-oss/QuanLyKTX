@@ -1,0 +1,150 @@
+/* Giao diện Gửi xe – không ảnh hưởng style.css của màn hình khác. */
+.parking-page {
+    -fx-font-family: "Segoe UI", "Arial";
+    -fx-background-color: transparent;
+}
+.parking-overline { -fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #547498; }
+.parking-subtitle { -fx-font-size: 13px; -fx-text-fill: #7487A1; }
+.parking-icon-month { -fx-text-fill: #2563EB; -fx-font-size: 22px; }
+.parking-month-select { -fx-background-color: #E7F1FF; -fx-background-radius: 8; -fx-border-color: #C8DFF9; -fx-border-radius: 8; }
+.parking-stat { -fx-padding: 17 20; -fx-background-radius: 13; -fx-border-radius: 13; -fx-border-width: 1; -fx-min-height: 109; }
+.parking-stat-blue { -fx-background-color: #EAF0FC; -fx-border-color: #D6E4FA; }
+.parking-stat-green { -fx-background-color: #E7F5F1; -fx-border-color: #D1EDE4; }
+.parking-stat-amber { -fx-background-color: #FCF2E6; -fx-border-color: #F5E5D0; }
+.parking-stat-caption { -fx-text-fill: #59708C; -fx-font-size: 12px; }
+.parking-stat-icon-blue { -fx-font-size: 18px; -fx-text-fill: #2364DB; }
+.parking-stat-icon-green { -fx-font-size: 18px; -fx-text-fill: #088C78; }
+.parking-stat-icon-amber { -fx-font-size: 18px; -fx-text-fill: #B77920; }
+.parking-stat-value-blue { -fx-font-weight: bold; -fx-font-size: 27px; -fx-text-fill: #175CD3; }
+.parking-stat-value-green { -fx-font-weight: bold; -fx-font-size: 27px; -fx-text-fill: #07846B; }
+.parking-stat-value-amber { -fx-font-weight: bold; -fx-font-size: 27px; -fx-text-fill: #A2681A; }
+.parking-tabs { -fx-background-color: transparent; }
+.parking-tabs > .tab-header-area > .tab-header-background { -fx-background-color: transparent; }
+.parking-tabs > .tab-header-area .headers-region { -fx-background-color: #EDF3FB; -fx-background-radius: 10; }
+.parking-tabs .tab { -fx-background-color: transparent; -fx-background-insets: 0; -fx-padding: 9 26; -fx-background-radius: 9; }
+.parking-tabs .tab:selected { -fx-background-color: #E0EBFF; -fx-border-color: transparent transparent #2563EB transparent; -fx-border-width: 0 0 2 0; }
+.parking-tabs .tab .tab-label { -fx-text-fill: #667994; -fx-font-weight: bold; -fx-font-size: 12px; }
+.parking-tabs .tab:selected .tab-label { -fx-text-fill: #175FD5; }
+.parking-tabs > .tab-content-area { -fx-padding: 11 0 0 0; -fx-background-color: transparent; }
+.parking-panel { -fx-background-color: white; -fx-background-radius: 13; -fx-border-color: #DAE5F2; -fx-border-radius: 13; -fx-padding: 17 19; }
+.parking-panel-title { -fx-text-fill: #152D4D; -fx-font-weight: bold; -fx-font-size: 17px; }
+.parking-panel-icon { -fx-font-size: 22px; -fx-text-fill: #2563EB; }
+.parking-muted { -fx-text-fill: #7B8EA5; -fx-font-size: 11px; }
+.parking-tag { -fx-text-fill: #245FBA; -fx-background-color: #E7F1FF; -fx-background-radius: 14; -fx-padding: 5 9; -fx-font-size: 10px; -fx-font-weight: bold; }
+.parking-tag-green { -fx-text-fill: #087B5C; -fx-background-color: #E0F4E9; -fx-background-radius: 14; -fx-padding: 5 9; -fx-font-size: 11px; -fx-font-weight: bold; }
+.parking-search { -fx-background-color: white; -fx-background-radius: 7; -fx-border-color: #C8D7EA; -fx-border-radius: 7; -fx-border-width: 1; -fx-padding: 8 10; -fx-text-fill: #264362; }
+.parking-search:focused { -fx-border-color: #2563EB; }
+.parking-primary, .parking-action-blue { -fx-background-color: #2563EB; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-weight: bold; -fx-padding: 10 14; -fx-cursor: hand; }
+.parking-primary:hover, .parking-action-blue:hover { -fx-background-color: #1454CF; }
+.parking-outline { -fx-background-color: #F8FBFF; -fx-text-fill: #315277; -fx-border-color: #CCDAEB; -fx-border-radius: 7; -fx-background-radius: 7; -fx-padding: 9 12; -fx-cursor: hand; }
+.parking-outline:hover { -fx-background-color: #E9F1FD; }
+.parking-outline-success { -fx-background-color: #E4F5EE; -fx-text-fill: #087A5C; -fx-background-radius: 7; -fx-padding: 9 14; -fx-cursor: hand; }
+.parking-ghost { -fx-background-color: transparent; -fx-text-fill: #2364D7; -fx-font-weight: bold; -fx-cursor: hand; }
+.parking-action-teal { -fx-background-color: #0F918A; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-weight: bold; -fx-padding: 10 14; -fx-cursor: hand; }
+.parking-action-teal:hover { -fx-background-color: #087772; }
+.parking-action-teal:disabled, .parking-action-blue:disabled { -fx-opacity: 0.43; }
+.parking-vehicle-card { -fx-background-color: #ECF4FF; -fx-border-color: #D5E5FC; -fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 14; }
+.parking-vehicle-icon { -fx-text-fill: #175FD1; -fx-font-size: 31px; -fx-background-color: #D2E6FE; -fx-background-radius: 9; -fx-padding: 9 13; }
+.parking-vehicle-plate { -fx-text-fill: #173D72; -fx-font-size: 19px; -fx-font-weight: bold; }
+.parking-key { -fx-text-fill: #607B9A; -fx-font-size: 12px; }
+.parking-info { -fx-text-fill: #183B63; -fx-font-size: 12px; -fx-font-weight: bold; }
+.parking-status-valid { -fx-background-color: #D9F4E2; -fx-text-fill: #137D41; -fx-padding: 5 9; -fx-background-radius: 11; -fx-font-size: 11px; -fx-font-weight: bold; }
+.parking-status-expired { -fx-background-color: #FFF0DF; -fx-text-fill: #AF6C1E; -fx-padding: 5 9; -fx-background-radius: 11; -fx-font-size: 11px; -fx-font-weight: bold; }
+.parking-status-neutral { -fx-background-color: #E6EBF2; -fx-text-fill: #64748B; -fx-padding: 5 9; -fx-background-radius: 11; -fx-font-size: 11px; }
+.parking-free-card { -fx-background-color: #F0F6FF; -fx-border-color: #DCE9FC; -fx-background-radius: 9; -fx-border-radius: 9; -fx-padding: 12; }
+.parking-free-icon { -fx-font-size: 21px; -fx-text-fill: #2865D2; }
+.parking-free-label { -fx-font-size: 11px; -fx-text-fill: #41678F; }
+.parking-free-value { -fx-text-fill: #1357CA; -fx-font-size: 20px; -fx-font-weight: bold; }
+.parking-today-value { -fx-text-fill: #0C8C84; -fx-font-size: 17px; -fx-font-weight: bold; }
+.parking-field-caption { -fx-text-fill: #546C89; -fx-font-size: 12px; -fx-font-weight: bold; }
+.parking-table { -fx-background-color: white; -fx-border-color: #DFE8F4; -fx-border-radius: 7; -fx-background-radius: 7; -fx-fixed-cell-size: 32; }
+.parking-table .column-header-background { -fx-background-color: #E9F1FC; }
+.parking-table .column-header { -fx-background-color: #E9F1FC; -fx-border-color: transparent #DDE7F4 transparent transparent; }
+.parking-table .column-header .label { -fx-text-fill: #24436A; -fx-font-size: 11px; -fx-font-weight: bold; }
+.parking-table .table-row-cell:odd { -fx-background-color: #F5F8FC; }
+.parking-table .table-row-cell:even { -fx-background-color: white; }
+.parking-table .table-row-cell:hover { -fx-background-color: #E9F3FF; }
+.parking-table .table-row-cell:selected { -fx-background-color: #D6E7FF; }
+.parking-table .table-cell { -fx-text-fill: #28415F; -fx-font-size: 11px; -fx-border-color: transparent; }
+.parking-page .date-picker, .parking-page .combo-box { -fx-border-color: #CBD9EC; -fx-border-radius: 7; -fx-background-radius: 7; -fx-background-color: white; }
+.parking-page .date-picker .text-field { -fx-background-color: white; }
+
+/* --- Chọn tháng bất kỳ, không giới hạn dữ liệu đã có --- */
+.parking-month-label { -fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #506E94; }
+.parking-month-input {
+    -fx-background-color: white; -fx-text-fill: #183A66;
+    -fx-background-radius: 8; -fx-border-radius: 8;
+    -fx-border-color: #BDD3F0; -fx-border-width: 1;
+    -fx-font-size: 13px; -fx-font-weight: bold;
+    -fx-padding: 8 10;
+}
+.parking-month-input:focused { -fx-border-color: #2563EB; -fx-background-color: #F9FCFF; }
+.parking-month-apply {
+    -fx-background-color: #2563EB; -fx-text-fill: white; -fx-font-weight: bold;
+    -fx-background-radius: 8; -fx-padding: 9 17; -fx-cursor: hand;
+}
+.parking-month-apply:hover { -fx-background-color: #1753C5; }
+
+/* --- Dialog chi tiết vé tháng --- */
+.parking-detail-dialog { -fx-background-color: #FFFFFF; -fx-font-family: "Segoe UI", "Arial"; }
+.parking-detail-dialog > .content { -fx-padding: 0; }
+.parking-detail-dialog .button-bar { -fx-padding: 4 20 17 20; }
+.parking-detail-dialog .button-bar .button { -fx-min-width: 122; -fx-font-size: 12px; }
+.parking-detail-content { -fx-padding: 22 22 12 22; -fx-background-color: #FFFFFF; }
+.parking-detail-heading { -fx-font-size: 22px; -fx-text-fill: #142B4A; -fx-font-weight: bold; }
+.parking-detail-subheading { -fx-font-size: 12px; -fx-text-fill: #7588A1; }
+.parking-detail-badge { -fx-background-radius: 30; -fx-padding: 7 12; -fx-font-weight: bold; -fx-font-size: 12px; }
+.parking-detail-badge-valid { -fx-background-color: #D8F5E4; -fx-text-fill: #11773D; }
+.parking-detail-badge-expired { -fx-background-color: #FFF0DF; -fx-text-fill: #A75F1A; }
+.parking-detail-badge-future { -fx-background-color: #E8EEF7; -fx-text-fill: #546882; }
+.parking-detail-plate-card { -fx-background-color: #E9F1FE; -fx-background-radius: 14; -fx-border-radius: 14; -fx-padding: 20 23; }
+.parking-detail-plate-caption { -fx-text-fill: #687F9E; -fx-font-size: 11px; -fx-font-weight: bold; }
+.parking-detail-plate-number { -fx-text-fill: #1558BE; -fx-font-size: 33px; -fx-font-weight: bold; }
+.parking-detail-plate-description { -fx-text-fill: #55708F; -fx-font-size: 13px; }
+.parking-detail-grid { -fx-padding: 0; }
+.parking-detail-field { -fx-background-color: #F8FAFD; -fx-background-radius: 9; -fx-padding: 12; -fx-min-height: 68px; }
+.parking-detail-caption { -fx-text-fill: #71849E; -fx-font-size: 11px; }
+.parking-detail-value { -fx-text-fill: #193655; -fx-font-size: 14px; -fx-font-weight: bold; }
+.parking-detail-validity-box { -fx-background-color: #F2F7FE; -fx-background-radius: 9; -fx-padding: 12 15; }
+.parking-detail-validity { -fx-text-fill: #255C9F; -fx-font-size: 13px; -fx-font-weight: bold; }
+.parking-detail-edit-button { -fx-background-color: #E6EDFC; -fx-text-fill: #135FC5; -fx-background-radius: 8; -fx-padding: 11 18; -fx-font-weight: bold; -fx-cursor: hand; }
+.parking-detail-edit-button:hover { -fx-background-color: #D4E4FF; }
+.parking-detail-renew-button { -fx-background-color: #DBF3EA; -fx-text-fill: #087F54; -fx-background-radius: 8; -fx-padding: 11 18; -fx-font-weight: bold; -fx-cursor: hand; }
+.parking-detail-renew-button:hover { -fx-background-color: #C6EEDC; }
+.parking-detail-close-button { -fx-background-color: #F2F5F9; -fx-text-fill: #4E637C; -fx-background-radius: 8; -fx-padding: 11 18; -fx-cursor: hand; }
+.parking-detail-close-button:hover { -fx-background-color: #E6EBF2; }
+
+
+/* --- Dialog Sửa / Đăng ký và Gia hạn vé tháng (cùng phong cách Chi tiết vé) --- */
+.parking-form-dialog { -fx-background-color: #FFFFFF; -fx-font-family: "Segoe UI", "Arial"; }
+.parking-form-dialog > .content { -fx-padding: 0; -fx-background-color: #FFFFFF; }
+.parking-form-dialog .button-bar { -fx-background-color: #FFFFFF; -fx-padding: 4 22 18 22; }
+.parking-form-dialog .button-bar .button { -fx-min-width: 105; -fx-min-height: 38; -fx-font-size: 12px; }
+.parking-form-content { -fx-padding: 23 24 12 24; -fx-background-color: #FFFFFF; }
+.parking-form-heading { -fx-font-size: 21px; -fx-font-weight: bold; -fx-text-fill: #142B4A; }
+.parking-form-subheading { -fx-font-size: 12px; -fx-text-fill: #6C819F; }
+.parking-form-card { -fx-background-color: #E9F1FE; -fx-background-radius: 12; -fx-padding: 16 19; }
+.parking-form-card-caption { -fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: #647D9F; }
+.parking-form-card-plate { -fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #1558BE; }
+.parking-form-card-description { -fx-font-size: 12px; -fx-text-fill: #5B7290; }
+.parking-form-label { -fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #314D6D; }
+.parking-form-input, .parking-form-select {
+    -fx-background-color: #FFFFFF; -fx-background-radius: 8;
+    -fx-border-color: #C8D8EB; -fx-border-radius: 8; -fx-border-width: 1;
+    -fx-padding: 7 10; -fx-pref-height: 38; -fx-text-fill: #19395F;
+    -fx-font-size: 13px;
+}
+.parking-form-input:focused, .parking-form-select:focused { -fx-border-color: #2563EB; }
+.parking-form-select .list-cell { -fx-text-fill: #19395F; -fx-background-color: transparent; }
+.parking-form-note { -fx-background-color: #F0F6FF; -fx-background-radius: 9;
+    -fx-padding: 11 12; -fx-text-fill: #426A9B; -fx-font-size: 12px; }
+.parking-form-error { -fx-text-fill: #B42318; -fx-font-size: 12px; -fx-font-weight: bold; }
+.parking-form-save-button { -fx-background-color: #2563EB; -fx-text-fill: white;
+    -fx-background-radius: 8; -fx-padding: 10 15; -fx-font-weight: bold; -fx-cursor: hand; }
+.parking-form-save-button:hover { -fx-background-color: #174FC6; }
+.parking-form-success-button { -fx-background-color: #0F918A; -fx-text-fill: white;
+    -fx-background-radius: 8; -fx-padding: 10 15; -fx-font-weight: bold; -fx-cursor: hand; }
+.parking-form-success-button:hover { -fx-background-color: #08776F; }
+.parking-form-cancel-button { -fx-background-color: #F2F5FA; -fx-text-fill: #465D79;
+    -fx-background-radius: 8; -fx-padding: 10 15; -fx-cursor: hand; }
+.parking-form-cancel-button:hover { -fx-background-color: #E4EBF5; }

@@ -128,8 +128,12 @@ public class MainController {
         loadPage("DichVuView.fxml", "Quản lý dịch vụ");
     }
 
-    @FXML private void showParking() {
-        showPlaceholder("Quản lý gửi xe", "Đăng ký vé xe tháng, ghi nhận lượt gửi/lấy và tính phí.");
+//    @FXML private void showParking() {
+//        showPlaceholder("Quản lý gửi xe", "Đăng ký vé xe tháng, ghi nhận lượt gửi/lấy và tính phí.");
+//    }
+    @FXML
+    private void showParking() {
+        loadPage("GuiXeView.fxml", "Quản lý gửi xe");
     }
 
 //    @FXML private void showBills() {
