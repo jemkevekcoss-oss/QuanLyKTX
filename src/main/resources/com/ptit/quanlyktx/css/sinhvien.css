@@ -1,0 +1,167 @@
+/* ============================================
+   PTIT KTX - Quan ly sinh vien
+   CSS riêg cho màn hình Sinh viên; không thay style.css toàn hệ thống.
+   ============================================ */
+.sv-root {
+    -fx-background-color: transparent;
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* Thẻ thống kê */
+.sv-stat-blue, .sv-stat-green, .sv-stat-amber {
+    -fx-background-radius: 13;
+    -fx-border-radius: 13;
+    -fx-border-width: 1;
+    -fx-padding: 18 20 16 20;
+}
+.sv-stat-blue {
+    -fx-background-color: #EAF0FC;
+    -fx-border-color: #CFDEFA;
+}
+.sv-stat-green {
+    -fx-background-color: #E7F6F1;
+    -fx-border-color: #CDEBE0;
+}
+.sv-stat-amber {
+    -fx-background-color: #FFF3E6;
+    -fx-border-color: #F6E0C6;
+}
+.sv-stat-label { -fx-font-size: 13px; -fx-text-fill: #586E8B; }
+.sv-stat-note { -fx-font-size: 11px; -fx-text-fill: #7B8DA4; }
+.sv-icon-blue, .sv-icon-green, .sv-icon-amber { -fx-font-size: 19px; -fx-font-weight: bold; }
+.sv-icon-blue, .sv-number-blue { -fx-text-fill: #1F59CA; }
+.sv-icon-green, .sv-number-green { -fx-text-fill: #0A8862; }
+.sv-icon-amber, .sv-number-amber { -fx-text-fill: #B56B17; }
+.sv-number-blue, .sv-number-green, .sv-number-amber {
+    -fx-font-size: 30px;
+    -fx-font-weight: bold;
+}
+
+/* Khung nội dung */
+.sv-panel {
+    -fx-background-color: white;
+    -fx-background-radius: 13;
+    -fx-border-color: #DCE6F2;
+    -fx-border-radius: 13;
+    -fx-border-width: 1;
+    -fx-padding: 20 22 18 22;
+}
+.sv-section-title { -fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #14263D; }
+.sv-section-note { -fx-font-size: 12px; -fx-text-fill: #7486A0; }
+.sv-search {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #CDD9EA;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-size: 12px;
+    -fx-padding: 7 12;
+    -fx-text-fill: #183250;
+    -fx-prompt-text-fill: #97A7BC;
+}
+.sv-search:focused { -fx-border-color: #3679E9; -fx-effect: dropshadow(gaussian, rgba(53,112,225,0.13), 7, 0, 0, 0); }
+
+/* Nút chức năng */
+.sv-add-button, .sv-edit-button, .sv-delete-button, .sv-refresh-button {
+    -fx-cursor: hand;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 14;
+}
+.sv-add-button { -fx-background-color: #2563EB; -fx-text-fill: white; }
+.sv-add-button:hover { -fx-background-color: #1D4ED8; }
+.sv-edit-button { -fx-background-color: #EAF1FF; -fx-text-fill: #2457A5; -fx-border-color: #D3E1FA; }
+.sv-edit-button:hover { -fx-background-color: #DCEBFF; }
+.sv-delete-button { -fx-background-color: #FFF0F0; -fx-text-fill: #B33C3C; -fx-border-color: #F4D2D2; }
+.sv-delete-button:hover { -fx-background-color: #FFE4E4; }
+.sv-refresh-button { -fx-background-color: #F5F8FC; -fx-text-fill: #4F6787; -fx-border-color: #D8E3F1; }
+.sv-refresh-button:hover { -fx-background-color: #EAF0F8; }
+
+/* Bảng sinh viên */
+.sv-table {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-border-color: #D7E2EF;
+    -fx-border-radius: 8;
+    -fx-padding: 0;
+    -fx-table-cell-border-color: #E6EDF6;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+.sv-table .column-header-background { -fx-background-color: #E8F0FB; }
+.sv-table .column-header, .sv-table .filler {
+    -fx-background-color: #E8F0FB;
+    -fx-size: 41px;
+    -fx-border-color: transparent #D7E2EF #D7E2EF transparent;
+    -fx-border-width: 0 1 1 0;
+}
+.sv-table .column-header .label {
+    -fx-text-fill: #193B67;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 0 6;
+}
+.sv-table .table-row-cell { -fx-cell-size: 37px; -fx-background-color: white; }
+.sv-table .table-row-cell:odd { -fx-background-color: #F5F8FC; }
+.sv-table .table-row-cell:hover { -fx-background-color: #EBF2FC; }
+.sv-table .table-row-cell:filled:selected,
+.sv-table .table-row-cell:filled:selected:hover {
+    -fx-background-color: #D5E6FF;
+}
+.sv-table .table-cell {
+    -fx-text-fill: #203B5B;
+    -fx-font-size: 12px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 0 8;
+    -fx-border-color: transparent #E6EDF6 transparent transparent;
+    -fx-border-width: 0 1 0 0;
+}
+.sv-empty-text, .sv-footer-count { -fx-text-fill: #7589A4; -fx-font-size: 12px; }
+
+/* Hộp thoại Thêm / Sửa sinh viên */
+.sv-dialog-pane {
+    -fx-background-color: #F8FAFE;
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+}
+.sv-dialog-pane > .content { -fx-padding: 0; }
+.sv-dialog-pane > .button-bar > .container { -fx-padding: 13 19 16 19; }
+.sv-dialog-content { -fx-padding: 21 23 12 23; }
+.sv-dialog-title { -fx-text-fill: #152B49; -fx-font-size: 21px; -fx-font-weight: bold; }
+.sv-dialog-description { -fx-text-fill: #7486A0; -fx-font-size: 12px; }
+.sv-dialog-banner {
+    -fx-background-color: #EAF1FF;
+    -fx-background-radius: 10;
+    -fx-padding: 12 15;
+}
+.sv-dialog-banner-label { -fx-text-fill: #315C99; -fx-font-size: 12px; }
+.sv-field-label { -fx-text-fill: #4D6382; -fx-font-size: 12px; -fx-font-weight: bold; }
+.sv-field-input, .sv-dialog-content .date-picker {
+    -fx-background-color: white;
+    -fx-border-color: #CDD9EB;
+    -fx-border-radius: 7;
+    -fx-background-radius: 7;
+    -fx-pref-height: 37;
+    -fx-font-size: 12px;
+}
+.sv-field-input:focused { -fx-border-color: #3578E8; }
+.sv-field-input:disabled { -fx-opacity: 0.75; }
+.sv-validation-error { -fx-text-fill: #B43B3B; -fx-font-size: 12px; }
+.sv-dialog-save {
+    -fx-background-color: #2563EB;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 7;
+    -fx-padding: 9 17;
+    -fx-cursor: hand;
+}
+.sv-dialog-save:hover { -fx-background-color: #1D4ED8; }
+.sv-dialog-cancel {
+    -fx-background-color: #E9EFF8;
+    -fx-text-fill: #4B607F;
+    -fx-background-radius: 7;
+    -fx-padding: 9 17;
+    -fx-cursor: hand;
+}

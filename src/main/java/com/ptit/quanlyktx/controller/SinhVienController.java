@@ -6,22 +6,25 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 import com.ptit.quanlyktx.dao.SinhVienDAO;
 import java.sql.SQLException;
 
-/**
- * Bước 2: Quản lý sinh viên bằng dữ liệu mẫu trong bộ nhớ.
- * Sau này thay các thao tác trên danhSach bằng SinhVienService/DAO.
- */
+/** Quản lý sinh viên nội trú: CRUD và thống kê dữ liệu thực từ MySQL. */
 public class SinhVienController {
     
     private final SinhVienDAO sinhVienDAO = new SinhVienDAO();
@@ -32,6 +35,13 @@ public class SinhVienController {
     @FXML private TableColumn<SinhVien, String> colMaSV, colHoTen, colSoCmt,
             colLop, colQueQuan, colSoPhong, colNgayVaoO;
     @FXML private Label lblCount;
+    @FXML private Label lblTotalStudents;
+    @FXML private Label lblOccupiedRooms;
+    @FXML private Label lblNewThisMonth;
+    @FXML private TableColumn<SinhVien, String> colNgaySinh;
+
+    private static final DateTimeFormatter DISPLAY_DATE =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final ObservableList<SinhVien> danhSach = FXCollections.observableArrayList();
     private FilteredList<SinhVien> filtered;
@@ -41,11 +51,14 @@ public class SinhVienController {
         colMaSV.setCellValueFactory(c -> str(c.getValue().getMaSV()));
         colHoTen.setCellValueFactory(c -> str(c.getValue().getHoTen()));
         colSoCmt.setCellValueFactory(c -> str(c.getValue().getSoCmt()));
+        colNgaySinh.setCellValueFactory(c -> str(formatDate(c.getValue().getNgaySinh())));
         colLop.setCellValueFactory(c -> str(c.getValue().getLop()));
         colQueQuan.setCellValueFactory(c -> str(c.getValue().getQueQuan()));
         colSoPhong.setCellValueFactory(c -> str(c.getValue().getSoPhong()));
-        colNgayVaoO.setCellValueFactory(c -> str(
-                c.getValue().getNgayVaoO() == null ? "" : c.getValue().getNgayVaoO().toString()));
+        colNgayVaoO.setCellValueFactory(c -> str(formatDate(c.getValue().getNgayVaoO())));
+        // Đặt bằng Java để tránh lỗi FXMLLoader coerce CONSTRAINED_RESIZE_POLICY.
+        tableStudents.setColumnResizePolicy(
+                TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
         
        
@@ -68,8 +81,9 @@ public class SinhVienController {
         // Đọc dữ liệu mới nhất từ MySQL
         danhSach.setAll(sinhVienDAO.findAll());
 
-        // Cập nhật số lượng sinh viên
+        // Đồng bộ bảng và thẻ thống kê với dữ liệu MySQL mới nhất.
         updateCount();
+        updateStatistics();
 
         // Tải thành công
         return true;
@@ -88,10 +102,34 @@ public class SinhVienController {
         return new ReadOnlyStringWrapper(text == null ? "" : text);
     }
 
+    private String formatDate(LocalDate date) {
+        return date == null ? "" : date.format(DISPLAY_DATE);
+    }
+
+    // Thống kê từ toàn bộ danh sách đọc từ MySQL, không phụ thuộc từ khóa tìm kiếm.
+    private void updateStatistics() {
+        lblTotalStudents.setText(String.valueOf(danhSach.size()));
+
+        Set<String> occupied = danhSach.stream()
+                .map(SinhVien::getSoPhong)
+                .filter(p -> p != null && !p.isBlank())
+                .map(p -> p.trim().toUpperCase(Locale.ROOT))
+                .collect(Collectors.toSet());
+        lblOccupiedRooms.setText(String.valueOf(occupied.size()));
+
+        YearMonth now = YearMonth.now();
+        long newStudents = danhSach.stream()
+                .map(SinhVien::getNgayVaoO)
+                .filter(date -> date != null && YearMonth.from(date).equals(now))
+                .count();
+        lblNewThisMonth.setText(String.valueOf(newStudents));
+    }
+
     private void applySearch(String text) {
         String term = text == null ? "" : text.trim().toLowerCase(Locale.ROOT);
         filtered.setPredicate(sv -> term.isEmpty() || (
-                (safe(sv.getMaSV()) + " " + safe(sv.getHoTen()) + " " + safe(sv.getLop())
+                (safe(sv.getMaSV()) + " " + safe(sv.getHoTen()) + " "
+                + safe(sv.getSoCmt()) + " " + safe(sv.getLop())
                 + " " + safe(sv.getQueQuan()) + " " + safe(sv.getSoPhong()))
                     .toLowerCase(Locale.ROOT).contains(term)));
         updateCount();
@@ -213,13 +251,26 @@ public class SinhVienController {
         loadFromDatabase();
     }
 
+    /** Cửa sổ thêm/sửa: chỉ đổi bố cục, vẫn dùng hàm validate và DAO cũ. */
     private Optional<SinhVien> showForm(SinhVien current) {
         Dialog<SinhVien> dialog = new Dialog<>();
         boolean editing = current != null;
         dialog.setTitle(editing ? "Sửa thông tin sinh viên" : "Thêm sinh viên");
-        dialog.setHeaderText("Nhập thông tin theo 8 thuộc tính của bảng SINH_VIEN");
-        ButtonType saveType = new ButtonType("Lưu", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(saveType, ButtonType.CANCEL);
+        dialog.setHeaderText(null);
+        dialog.setResizable(true);
+
+        ButtonType saveType = new ButtonType(
+                editing ? "Lưu thay đổi" : "Thêm sinh viên", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancelType = new ButtonType("Hủy", ButtonBar.ButtonData.CANCEL_CLOSE);
+        DialogPane pane = dialog.getDialogPane();
+        pane.getButtonTypes().addAll(saveType, cancelType);
+        pane.getStyleClass().add("sv-dialog-pane");
+        // Dialog là một cửa sổ riêng, phải nạp CSS riêng cho nó.
+        java.net.URL css = getClass().getResource(
+                "/com/ptit/quanlyktx/css/sinhvien.css");
+        if (css != null) {
+            pane.getStylesheets().add(css.toExternalForm());
+        }
 
         TextField ma = new TextField(editing ? safe(current.getMaSV()) : "");
         TextField cmt = new TextField(editing ? safe(current.getSoCmt()) : "");
@@ -229,32 +280,64 @@ public class SinhVienController {
         TextField phong = new TextField(editing ? safe(current.getSoPhong()) : "");
         DatePicker sinh = new DatePicker(editing ? current.getNgaySinh() : null);
         DatePicker vao = new DatePicker(editing ? current.getNgayVaoO() : LocalDate.now());
-        ma.setPromptText("Tối đa 20 ký tự");
+        ma.setPromptText("Ví dụ B22DCCN001");
         cmt.setPromptText("Số CMT/CCCD duy nhất");
+        ten.setPromptText("Nhập họ và tên đầy đủ");
+        lop.setPromptText("Ví dụ D22CNPM1");
+        que.setPromptText("Tỉnh / thành phố");
         phong.setPromptText("Ví dụ P101");
-        // Không cho thay khóa chính khi sửa: bản demo tránh đổi FK liên quan.
+        // Giữ khóa chính khi sửa để tránh ảnh hưởng FK các bảng liên quan.
         ma.setDisable(editing);
 
         GridPane grid = new GridPane();
-        grid.setHgap(12); grid.setVgap(10); grid.setPadding(new Insets(12));
-        Object[][] fields = {
-            {"Mã sinh viên", ma}, {"Số CMT/CCCD", cmt}, {"Họ và tên", ten},
-            {"Ngày sinh", sinh}, {"Lớp", lop}, {"Quê quán", que},
-            {"Số phòng", phong}, {"Ngày vào ở", vao}
-        };
-        for (int i = 0; i < fields.length; i++) {
-            grid.add(new Label((String) fields[i][0]), 0, i);
-            grid.add((javafx.scene.Node) fields[i][1], 1, i);
-        }
-        dialog.getDialogPane().setContent(grid);
-        dialog.getDialogPane().setPrefWidth(450);
+        grid.setHgap(14);
+        grid.setVgap(13);
+        ColumnConstraints left = new ColumnConstraints();
+        ColumnConstraints right = new ColumnConstraints();
+        left.setPercentWidth(50);
+        right.setPercentWidth(50);
+        left.setHgrow(Priority.ALWAYS);
+        right.setHgrow(Priority.ALWAYS);
+        grid.getColumnConstraints().addAll(left, right);
+        grid.add(formField("Mã sinh viên", ma), 0, 0);
+        grid.add(formField("Họ và tên", ten), 1, 0);
+        grid.add(formField("Số CMT/CCCD", cmt), 0, 1);
+        grid.add(formField("Ngày sinh", sinh), 1, 1);
+        grid.add(formField("Lớp", lop), 0, 2);
+        grid.add(formField("Quê quán", que), 1, 2);
+        grid.add(formField("Phòng ở", phong), 0, 3);
+        grid.add(formField("Ngày vào ở", vao), 1, 3);
+
+        Label title = new Label(editing ? "Cập nhật hồ sơ sinh viên" : "Thêm sinh viên nội trú");
+        title.getStyleClass().add("sv-dialog-title");
+        Label subtitle = new Label("Thông tin được lưu trực tiếp vào bảng SINH_VIEN trong MySQL.");
+        subtitle.getStyleClass().add("sv-dialog-description");
+        Label tip = new Label(editing
+                ? "Mã sinh viên không thể thay đổi khi chỉnh sửa hồ sơ."
+                : "Điền đủ 8 trường thông tin. Kiểm tra số phòng trước khi lưu.");
+        tip.getStyleClass().add("sv-dialog-banner-label");
+        VBox banner = new VBox(tip);
+        banner.getStyleClass().add("sv-dialog-banner");
+
         Label error = new Label();
-        error.setStyle("-fx-text-fill: #B91C1C; -fx-wrap-text: true;");
-        grid.add(error, 0, fields.length, 2, 1);
-        javafx.scene.Node saveButton = dialog.getDialogPane().lookupButton(saveType);
+        error.setWrapText(true);
+        error.getStyleClass().add("sv-validation-error");
+
+        VBox content = new VBox(14, title, subtitle, banner, grid, error);
+        content.getStyleClass().add("sv-dialog-content");
+        pane.setContent(content);
+        pane.setPrefWidth(690);
+
+        Button saveButton = (Button) pane.lookupButton(saveType);
+        saveButton.getStyleClass().add("sv-dialog-save");
+        Button cancelButton = (Button) pane.lookupButton(cancelType);
+        cancelButton.getStyleClass().add("sv-dialog-cancel");
         saveButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
             String validation = validate(current, ma, cmt, ten, sinh, lop, que, phong, vao);
-            if (validation != null) { error.setText(validation); event.consume(); }
+            if (validation != null) {
+                error.setText(validation);
+                event.consume();
+            }
         });
         dialog.setResultConverter(button -> button == saveType
                 ? new SinhVien(ma.getText().trim(), cmt.getText().trim(), ten.getText().trim(),
@@ -262,6 +345,18 @@ public class SinhVienController {
                         phong.getText().trim(), vao.getValue())
                 : null);
         return dialog.showAndWait();
+    }
+
+    private VBox formField(String caption, Control input) {
+        Label title = new Label(caption);
+        title.getStyleClass().add("sv-field-label");
+        if (input instanceof TextField) {
+            input.getStyleClass().add("sv-field-input");
+        }
+        input.setMaxWidth(Double.MAX_VALUE);
+        VBox box = new VBox(6, title, input);
+        box.setMaxWidth(Double.MAX_VALUE);
+        return box;
     }
 
     private String validate(SinhVien current, TextField ma, TextField cmt,
