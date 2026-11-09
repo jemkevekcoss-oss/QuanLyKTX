@@ -8,7 +8,7 @@ import javafx.stage.Stage;
 public class App extends Application {
     @Override
     public void start(Stage stage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(App.class.getResource("/com/ptit/quanlyktx/fxml/MainView.fxml"));
+        FXMLLoader loader =   new FXMLLoader(App.class.getResource("/com/ptit/quanlyktx/fxml/MainView.fxml"));
         Scene scene = new Scene(loader.load(), 1150, 720);
         scene.getStylesheets().add(App.class.getResource("/com/ptit/quanlyktx/css/style.css").toExternalForm());
         stage.setTitle("PTIT KTX | Quản lý ký túc xá");

@@ -132,8 +132,12 @@ public class MainController {
         showPlaceholder("Quản lý gửi xe", "Đăng ký vé xe tháng, ghi nhận lượt gửi/lấy và tính phí.");
     }
 
-    @FXML private void showBills() {
-        showPlaceholder("Hóa đơn thanh toán", "Tính tiền phòng và dịch vụ theo tháng cho từng sinh viên.");
+//    @FXML private void showBills() {
+//        showPlaceholder("Hóa đơn thanh toán", "Tính tiền phòng và dịch vụ theo tháng cho từng sinh viên.");
+//    }
+    @FXML 
+    private void showBills() {
+       loadPage("HoaDonView.fxml", "Hóa đơn thanh toán");
     }
 
     @FXML private void showReports() {

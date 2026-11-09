@@ -1,11 +1,13 @@
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\App.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\controller\DashboardController.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\controller\DichVuController.java
+C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\controller\HoaDonController.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\controller\KhachThamController.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\controller\MainController.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\controller\PhongController.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\controller\SinhVienController.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\dao\DichVuDAO.java
+C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\dao\HoaDonDAO.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\dao\KhachThamDAO.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\dao\PhongDAO.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\dao\SinhVienDAO.java
@@ -13,6 +15,7 @@ C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\dao\SuDungDichVuDAO.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\database\DatabaseConnection.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\database\TestConnection.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\dto\ChiPhiDichVuRow.java
+C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\dto\HoaDonRow.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\dto\KhachThamRow.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\dto\LichSuDichVuRow.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\dto\PhongThongKe.java

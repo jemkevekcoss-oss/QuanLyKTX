@@ -15,10 +15,12 @@ com\ptit\quanlyktx\dto\ChiPhiDichVuRow.class
 com\ptit\quanlyktx\controller\DichVuController.class
 com\ptit\quanlyktx\controller\DashboardController.class
 com\ptit\quanlyktx\controller\PhongController.class
+com\ptit\quanlyktx\dao\HoaDonDAO.class
 com\ptit\quanlyktx\model\KhachTham.class
 com\ptit\quanlyktx\controller\SinhVienController.class
 com\ptit\quanlyktx\model\SuDungDichVu.class
 com\ptit\quanlyktx\controller\MainController.class
+com\ptit\quanlyktx\controller\HoaDonController.class
 com\ptit\quanlyktx\dto\LichSuDichVuRow.class
 com\ptit\quanlyktx\controller\DichVuController$1.class
 com\ptit\quanlyktx\dao\KhachThamDAO$SinhVienOption.class
@@ -26,5 +28,6 @@ com\ptit\quanlyktx\dto\KhachThamRow.class
 com\ptit\quanlyktx\model\LuotGuiXe.class
 com\ptit\quanlyktx\dao\SinhVienDAO.class
 com\ptit\quanlyktx\dao\PhongDAO.class
+com\ptit\quanlyktx\dto\HoaDonRow.class
 com\ptit\quanlyktx\model\SinhVien.class
 com\ptit\quanlyktx\controller\DichVuController$2.class
