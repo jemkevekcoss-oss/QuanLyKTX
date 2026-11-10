@@ -1,0 +1,49 @@
+.dash-root { -fx-background-color: transparent; -fx-font-family: "Segoe UI", "Arial"; }
+.dash-page-icon { -fx-background-color: #E3EFFD; -fx-background-radius: 16; }
+.dash-page-icon-text { -fx-font-size: 31px; -fx-text-fill: #125FE2; -fx-font-weight: bold; }
+.dash-eyebrow { -fx-text-fill: #5879A5; -fx-font-size: 11px; -fx-font-weight: bold; }
+.dash-page-heading { -fx-text-fill: #10294F; -fx-font-size: 27px; -fx-font-weight: bold; }
+.dash-refresh { -fx-text-fill: #125EE4; -fx-font-weight: bold; -fx-background-color: white; -fx-background-radius: 9; -fx-border-color: #C6D8F4; -fx-border-radius: 9; -fx-padding: 11 19; -fx-cursor: hand; }
+.dash-refresh:hover, .dash-more:hover { -fx-background-color: #E8F1FF; }
+.dash-kpi { -fx-min-height: 112px; -fx-padding: 16 19; -fx-background-radius: 14; -fx-border-radius: 14; -fx-border-width: 1; }
+.dash-kpi-blue { -fx-background-color: #E7F0FE; -fx-border-color: #A9CAFC; }
+.dash-kpi-green { -fx-background-color: #E2F7EF; -fx-border-color: #A0DFC4; }
+.dash-kpi-orange { -fx-background-color: #FFF1D5; -fx-border-color: #F4C472; }
+.dash-kpi-purple { -fx-background-color: #F1E5FC; -fx-border-color: #D6B4F2; }
+.dash-kpi-label { -fx-text-fill: #27405F; -fx-font-size: 14px; -fx-font-weight: bold; }
+.dash-kpi-icon { -fx-font-size: 23px; -fx-font-weight: bold; }
+.dash-kpi-value { -fx-font-size: 31px; -fx-font-weight: bold; }
+.dash-text-blue { -fx-text-fill: #155ED3; }
+.dash-text-green { -fx-text-fill: #04875D; }
+.dash-text-orange { -fx-text-fill: #C16A11; }
+.dash-text-purple { -fx-text-fill: #7C33BD; }
+.dash-text-teal { -fx-text-fill: #0D988A; }
+.dash-panel { -fx-padding: 19; -fx-background-color: white; -fx-background-radius: 14; -fx-border-color: #D6E1F1; -fx-border-width: 1; -fx-border-radius: 14; }
+.dash-panel-title { -fx-text-fill: #10294F; -fx-font-size: 20px; -fx-font-weight: bold; }
+.dash-panel-icon { -fx-text-fill: #126CF0; -fx-font-size: 24px; -fx-font-weight: bold; }
+.dash-muted { -fx-text-fill: #6F829C; -fx-font-size: 12px; }
+.dash-percent { -fx-font-size: 38px; -fx-font-weight: bold; -fx-text-fill: #0F2752; }
+.dash-mini { -fx-min-height: 81px; -fx-padding: 13; -fx-background-radius: 12; }
+.dash-mini-blue { -fx-background-color: #E7F0FF; }
+.dash-mini-orange { -fx-background-color: #FFF0E4; }
+.dash-mini-teal { -fx-background-color: #DEF6F1; }
+.dash-mini-green { -fx-background-color: #DEF8EA; }
+.dash-mini-label { -fx-text-fill: #4F6684; -fx-font-size: 12px; }
+.dash-mini-value { -fx-font-size: 27px; -fx-font-weight: bold; }
+.dash-room-row { -fx-padding: 8 3 8 3; -fx-border-color: transparent transparent #EDF1F7 transparent; }
+.dash-room-code { -fx-text-fill: #15315A; -fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: #F0F4F9; -fx-background-radius: 7; -fx-padding: 7 8; -fx-alignment: center; }
+.dash-room-detail { -fx-text-fill: #244264; -fx-font-size: 12px; -fx-font-weight: bold; }
+.dash-room-progress { -fx-pref-height: 12px; }
+.dash-room-progress > .track { -fx-background-color: #E0E7F0; -fx-background-radius: 30; -fx-background-insets: 0; }
+.dash-room-progress > .bar { -fx-background-color: #1674F9; -fx-background-radius: 30; -fx-background-insets: 0; -fx-padding: 0; }
+.dash-more { -fx-text-fill: #0C5FE0; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-color: #F6F9FF; -fx-border-color: #5E9BFF; -fx-border-radius: 9; -fx-background-radius: 9; -fx-padding: 11; -fx-cursor: hand; }
+.dash-shortcut { -fx-alignment: center-left; -fx-content-display: graphic-only; -fx-min-height: 96px; -fx-padding: 15; -fx-background-radius: 12; -fx-border-radius: 12; -fx-border-width: 1; -fx-cursor: hand; }
+.dash-shortcut-blue { -fx-background-color: #D9EBFC; -fx-border-color: #82B8F6; }
+.dash-shortcut-green { -fx-background-color: #D7F5E8; -fx-border-color: #73D3AD; }
+.dash-shortcut-amber { -fx-background-color: #FFF0CA; -fx-border-color: #F2CD75; }
+.dash-shortcut-purple { -fx-background-color: #EEDBF9; -fx-border-color: #CAA1ED; }
+.dash-shortcut:hover { -fx-opacity: .84; }
+.dash-shortcut-icon { -fx-font-size: 28px; -fx-font-weight: bold; }
+.dash-shortcut-title { -fx-text-fill: #112B4C; -fx-font-size: 14px; -fx-font-weight: bold; }
+.dash-shortcut-sub { -fx-text-fill: #536D8C; -fx-font-size: 11px; }
+.dash-footer { -fx-text-fill: #8395AC; -fx-font-size: 11px; -fx-alignment: center-right; }

@@ -69,14 +69,25 @@ public class MainController {
 }
     }
 
+//    private void navigateTo(String page) {
+//        switch (page) {
+//            case "bills" -> showBills();
+//            case "reports" -> showReports();
+//            case "students" -> showStudents();
+//            default -> showDashboard();
+//        }
+//    }
     private void navigateTo(String page) {
-        switch (page) {
-            case "bills" -> showBills();
-            case "reports" -> showReports();
-            case "students" -> showStudents();
-            default -> showDashboard();
-        }
+    switch (page) {
+        case "students" -> showStudents();
+        case "rooms" -> showRooms();
+        case "bills" -> showBills();
+        case "parking" -> showParking();
+        case "reports" -> showReports();
+        default -> showDashboard();
     }
+}
+    
 
     // Giữ tạm màn hình chờ để menu cũ không bị lỗi khi các view chưa được tạo.
     private void showPlaceholder(String title, String message) {

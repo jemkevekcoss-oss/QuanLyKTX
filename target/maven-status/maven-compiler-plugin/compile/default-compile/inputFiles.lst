@@ -18,6 +18,7 @@ C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\dao\SinhVienDAO.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\dao\SuDungDichVuDAO.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\dao\ThongKeDAO.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\dao\ThongKeKhachDAO.java
+C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\dao\TongQuanDAO.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\dao\VeXeThangDAO.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\database\DatabaseConnection.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\database\TestConnection.java
@@ -32,6 +33,7 @@ C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\dto\PhongThongKe.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\dto\SinhVienOption.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\dto\ThongKeKhachRow.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\dto\ThongKeLuotTham.java
+C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\dto\TinhTrangPhongRow.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\dto\VeXeThangRow.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\model\DichVu.java
 C:\QLKTX\newJavaFX\src\main\java\com\ptit\quanlyktx\model\KhachTham.java

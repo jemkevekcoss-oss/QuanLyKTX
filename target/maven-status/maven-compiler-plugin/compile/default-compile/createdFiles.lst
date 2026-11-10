@@ -1,6 +1,7 @@
 com\ptit\quanlyktx\model\VeXeThang.class
 com\ptit\quanlyktx\App.class
 com\ptit\quanlyktx\dao\SuDungDichVuDAO.class
+com\ptit\quanlyktx\dao\TongQuanDAO$SoLieu.class
 com\ptit\quanlyktx\dao\KhachThamDAO.class
 com\ptit\quanlyktx\model\DichVu.class
 com\ptit\quanlyktx\database\TestConnection.class
@@ -31,6 +32,7 @@ com\ptit\quanlyktx\dto\ThongKeLuotTham.class
 com\ptit\quanlyktx\model\Phong.class
 com\ptit\quanlyktx\controller\ThongKeController$1.class
 com\ptit\quanlyktx\dto\PhongThongKe.class
+com\ptit\quanlyktx\dto\TinhTrangPhongRow.class
 com\ptit\quanlyktx\dto\ChiPhiDichVuRow.class
 com\ptit\quanlyktx\dao\VeXeThangDAO.class
 com\ptit\quanlyktx\controller\DashboardController.class
@@ -46,6 +48,7 @@ com\ptit\quanlyktx\dto\LuotGuiXeRow.class
 com\ptit\quanlyktx\dao\ThongKeKhachDAO.class
 com\ptit\quanlyktx\dao\SinhVienDAO.class
 com\ptit\quanlyktx\dao\LuotGuiXeDAO.class
+com\ptit\quanlyktx\dao\TongQuanDAO.class
 com\ptit\quanlyktx\dao\PhongDAO.class
 com\ptit\quanlyktx\dto\HoaDonRow.class
 com\ptit\quanlyktx\model\SinhVien.class
