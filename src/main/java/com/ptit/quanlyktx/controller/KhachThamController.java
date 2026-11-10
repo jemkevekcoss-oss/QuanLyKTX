@@ -1,338 +1,244 @@
 package com.ptit.quanlyktx.controller;
 
-import com.ptit.quanlyktx.dao.KhachThamDAO;
-import com.ptit.quanlyktx.dao.KhachThamDAO.SinhVienOption;
-import com.ptit.quanlyktx.dto.KhachThamRow;
-import com.ptit.quanlyktx.model.KhachTham;
-import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import com.ptit.quanlyktx.dao.*;
+import com.ptit.quanlyktx.dto.*;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.collections.*;
 import javafx.collections.transformation.FilteredList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
-
+import javafx.geometry.Insets;
 import java.sql.SQLException;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjusters;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.time.*;
+import java.time.format.*;
+import java.util.*;
+import java.util.function.Function;
 
-/** Màn Khách thăm: mỗi bản ghi KHACH_THAM là một LƯỢT đến thăm. */
+/** Controller độc lập cho KhachThamView.fxml (JavaFX 21+). */
 public class KhachThamController {
+    @FXML private Label lblTongLuot, lblLuotThang, lblKhachThang, lblDangTham, lblKhachCount, lblLuotCount, lblThongKe;
+    @FXML private TextField txtTimKhach, txtTimLuot, txtThang;
+    @FXML private TableView<KhachRow> tblKhach;
+    @FXML private TableColumn<KhachRow,Number> colKhachId;
+    @FXML private TableColumn<KhachRow,String> colCccd, colKhachTen, colKhachSinh;
+    @FXML private TableView<LuotDenThamRow> tblLuot;
+    @FXML private TableColumn<LuotDenThamRow,Number> colLuotId;
+    @FXML private TableColumn<LuotDenThamRow,String> colLuotKhach,colLuotCccd,colLuotSv,colLuotDen,colLuotDi,colLuotStatus;
+    @FXML private ComboBox<KhachRow> cboKhach;
+    @FXML private ComboBox<SinhVienOption> cboSinhVien;
+    @FXML private TableView<ThongKeKhachRow> tblThongKe;
+    @FXML private TableColumn<ThongKeKhachRow,String> colTkSv,colTkTenSv,colTkLop,colTkPhong,colTkCccd,colTkTenKhach,colTkNgaySinh,colTkNgayGan;
+    @FXML private TableColumn<ThongKeKhachRow,Number> colTkSoLan;
 
-    private static final String ALL = "Tất cả thời gian";
-    private static final String TODAY = "Hôm nay";
-    private static final String WEEK = "Tuần này";
-    private static final String MONTH = "Tháng này";
-    private static final DateTimeFormatter DATE_FORMAT =
-            DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private final KhachThamDAO khachDao = new KhachThamDAO();
+    private final LuotDenThamDAO luotDao = new LuotDenThamDAO();
+    private final ThongKeKhachDAO thongKeDao = new ThongKeKhachDAO();
+    private final ObservableList<KhachRow> khachData = FXCollections.observableArrayList();
+    private final ObservableList<LuotDenThamRow> luotData = FXCollections.observableArrayList();
+    private final FilteredList<KhachRow> filteredKhach = new FilteredList<>(khachData, k -> true);
+    private final FilteredList<LuotDenThamRow> filteredLuot = new FilteredList<>(luotData, k -> true);
+    private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final DateTimeFormatter DATETIME_FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    private static final DateTimeFormatter EDIT_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-    private final KhachThamDAO khachThamDAO = new KhachThamDAO();
-    private final ObservableList<KhachThamRow> visits = FXCollections.observableArrayList();
-    private FilteredList<KhachThamRow> filteredVisits;
-
-    @FXML private Label lblTotalVisits, lblMonthVisits, lblUniqueGuests;
-    @FXML private Label lblCount, lblSelected;
-    @FXML private TextField txtSearch;
-    @FXML private ComboBox<String> cbPeriod;
-    @FXML private TableView<KhachThamRow> tableVisits;
-    @FXML private TableColumn<KhachThamRow, String> colId, colGuestName, colGuestId,
-            colBirth, colVisitDate, colStudentId, colStudentName, colRoom;
-
-    @FXML
-    private void initialize() {
-        colId.setCellValueFactory(c -> text(String.valueOf(c.getValue().getKhach().getIdKhach())));
-        colGuestName.setCellValueFactory(c -> text(c.getValue().getKhach().getHoTen()));
-        colGuestId.setCellValueFactory(c -> text(c.getValue().getKhach().getSoCmt()));
-        colBirth.setCellValueFactory(c -> text(dateText(c.getValue().getKhach().getNgaySinh())));
-        colVisitDate.setCellValueFactory(c -> text(dateText(c.getValue().getKhach().getNgayDenChoi())));
-        colStudentId.setCellValueFactory(c -> text(c.getValue().getKhach().getMaSV()));
-        colStudentName.setCellValueFactory(c -> text(c.getValue().getTenSinhVien()));
-        colRoom.setCellValueFactory(c -> text(c.getValue().getSoPhong()));
-
-        tableVisits.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
-        cbPeriod.setItems(FXCollections.observableArrayList(ALL, TODAY, WEEK, MONTH));
-        cbPeriod.setValue(ALL);
-        filteredVisits = new FilteredList<>(visits, v -> true);
-        tableVisits.setItems(filteredVisits);
-
-        txtSearch.textProperty().addListener((obs, oldValue, newValue) -> applyFilter());
-        cbPeriod.valueProperty().addListener((obs, oldValue, newValue) -> applyFilter());
-        filteredVisits.addListener((javafx.collections.ListChangeListener<KhachThamRow>) change -> updateCount());
-        tableVisits.getSelectionModel().selectedItemProperty().addListener(
-                (obs, oldRow, newRow) -> showSelection(newRow));
-
-        loadFromDatabase(-1);
-    }
-
-    private ReadOnlyStringWrapper text(String value) {
-        return new ReadOnlyStringWrapper(value == null ? "" : value);
-    }
-
-    private String dateText(LocalDate date) {
-        return date == null ? "" : date.format(DATE_FORMAT);
-    }
-
-    private String safe(String value) { return value == null ? "" : value; }
-
-    private void applyFilter() {
-        String search = txtSearch.getText() == null ? "" :
-                txtSearch.getText().trim().toLowerCase(Locale.ROOT);
-        String period = cbPeriod.getValue();
-        LocalDate today = LocalDate.now();
-        LocalDate monday = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-
-        filteredVisits.setPredicate(row -> {
-            KhachTham k = row.getKhach();
-            String haystack = (k.getIdKhach() + " " + safe(k.getSoCmt()) + " "
-                    + safe(k.getHoTen()) + " " + safe(k.getMaSV()) + " "
-                    + safe(row.getTenSinhVien()) + " " + safe(row.getSoPhong()))
-                    .toLowerCase(Locale.ROOT);
-            if (!search.isEmpty() && !haystack.contains(search)) return false;
-
-            LocalDate date = k.getNgayDenChoi();
-            if (period == null || ALL.equals(period)) return true;
-            if (date == null) return false;
-            return switch (period) {
-                case TODAY -> date.isEqual(today);
-                case WEEK -> !date.isBefore(monday) && !date.isAfter(today);
-                case MONTH -> date.getMonthValue() == today.getMonthValue()
-                        && date.getYear() == today.getYear();
-                default -> true;
-            };
-        });
-        updateCount();
-    }
-
-    private void updateSummary() {
-        LocalDate today = LocalDate.now();
-        List<KhachThamRow> monthVisits = visits.stream()
-                .filter(row -> {
-                    LocalDate d = row.getKhach().getNgayDenChoi();
-                    return d != null && d.getYear() == today.getYear()
-                            && d.getMonthValue() == today.getMonthValue();
-                }).toList();
-        Set<String> uniqueIds = monthVisits.stream()
-                .map(row -> row.getKhach().getSoCmt())
-                .filter(id -> id != null && !id.isBlank())
-                .collect(Collectors.toSet());
-
-        lblTotalVisits.setText(String.valueOf(visits.size()));
-        lblMonthVisits.setText(String.valueOf(monthVisits.size()));
-        lblUniqueGuests.setText(String.valueOf(uniqueIds.size()));
-    }
-
-    private void updateCount() {
-        lblCount.setText("Hiển thị: " + filteredVisits.size() + " / " + visits.size() + " lượt thăm");
-    }
-
-    private void showSelection(KhachThamRow row) {
-        if (row == null) {
-            lblSelected.setText("Chọn một lượt khách trong bảng để xem tóm tắt.");
-            return;
-        }
-        KhachTham k = row.getKhach();
-        lblSelected.setText("Lượt #" + k.getIdKhach() + " · " + k.getHoTen()
-                + " (" + k.getSoCmt() + ") đến ngày " + dateText(k.getNgayDenChoi())
-                + " · Thăm " + k.getMaSV() + " - " + safe(row.getTenSinhVien())
-                + " · Phòng " + safe(row.getSoPhong()));
-    }
-
-    private boolean loadFromDatabase(int preferredId) {
-        try {
-            List<KhachThamRow> fresh = khachThamDAO.findAll();
-            visits.setAll(fresh);
-            updateSummary();
-            applyFilter();
-            KhachThamRow selected = filteredVisits.stream()
-                    .filter(row -> row.getKhach().getIdKhach() == preferredId)
-                    .findFirst().orElse(null);
-            if (selected != null) {
-                tableVisits.getSelectionModel().select(selected);
-                tableVisits.scrollTo(selected);
-            } else if (!filteredVisits.isEmpty()) {
-                tableVisits.getSelectionModel().selectFirst();
-            } else {
-                tableVisits.getSelectionModel().clearSelection();
-                showSelection(null);
-            }
-            return true;
-        } catch (SQLException ex) {
-            showDatabaseError("Không thể tải danh sách khách thăm", ex);
-            return false;
-        }
-    }
-
-    @FXML
-    private void handleRefresh() {
-        txtSearch.clear();
-        cbPeriod.setValue(ALL);
-        loadFromDatabase(-1);
-    }
-
-    @FXML
-    private void handleAdd() {
-        showForm(null).ifPresent(guest -> {
-            try {
-                if (khachThamDAO.insert(guest)) {
-                    txtSearch.clear();
-                    cbPeriod.setValue(ALL);
-                    loadFromDatabase(-1);
-                    info("Đã lưu lượt khách đến thăm vào MySQL.");
-                } else warn("Không thể lưu lượt khách.");
-            } catch (SQLException ex) {
-                showDatabaseError("Không thể ghi nhận khách đến", ex);
+    @FXML private void initialize() {
+        column(colKhachId,KhachRow::idKhach);
+        column(colCccd,KhachRow::soCmt);
+        column(colKhachTen,KhachRow::hoTen);
+        column(colKhachSinh,k -> fmt(k.ngaySinh()));
+        column(colLuotId,LuotDenThamRow::idLuot);
+        column(colLuotKhach,LuotDenThamRow::tenKhach);
+        column(colLuotCccd,LuotDenThamRow::soCmt);
+        column(colLuotSv,v -> v.maSv()+" — "+v.tenSv());
+        column(colLuotDen,v -> v.thoiGianDen()==null ? fmt(v.ngayDen())+" (chưa rõ giờ)" : DATETIME_FMT.format(v.thoiGianDen()));
+        column(colLuotDi,v -> v.thoiGianDi()==null ? "—" : DATETIME_FMT.format(v.thoiGianDi()));
+        column(colLuotStatus,LuotDenThamRow::trangThai);
+        column(colTkSv,ThongKeKhachRow::maSv);
+        column(colTkTenSv,ThongKeKhachRow::tenSv);
+        column(colTkLop,ThongKeKhachRow::lop);
+        column(colTkPhong,ThongKeKhachRow::soPhong);
+        column(colTkCccd,ThongKeKhachRow::soCmt);
+        column(colTkTenKhach,ThongKeKhachRow::tenKhach);
+        column(colTkNgaySinh,v -> fmt(v.ngaySinh()));
+        column(colTkNgayGan,v -> fmt(v.ngayDenGanNhat()));
+        column(colTkSoLan,ThongKeKhachRow::soLanDen);
+        // Danh ba co 4 cot: co gian cot theo be rong bang, khong de cot trong ben phai.
+        tblKhach.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        tblKhach.setItems(filteredKhach);
+        tblLuot.setItems(filteredLuot);
+        // To mau trang thai mot cach nhe nhang, khong can them cot DTO.
+        colLuotStatus.setCellFactory(col -> new TableCell<>() {
+            @Override protected void updateItem(String value, boolean empty) {
+                super.updateItem(value, empty);
+                getStyleClass().removeAll("kt-status-active", "kt-status-closed", "kt-status-unknown");
+                setText(empty ? null : value);
+                if (!empty && value != null) {
+                    if ("Đang thăm".equals(value)) getStyleClass().add("kt-status-active");
+                    else if ("Đã rời KTX".equals(value)) getStyleClass().add("kt-status-closed");
+                    else getStyleClass().add("kt-status-unknown");
+                }
             }
         });
+        txtTimKhach.textProperty().addListener((obs,oldText,newText) -> filterKhach());
+        txtTimLuot.textProperty().addListener((obs,oldText,newText) -> filterLuot());
+        txtThang.setText(YearMonth.now().toString());
+        reloadAll();
     }
-
-    @FXML
-    private void handleEdit() {
-        KhachThamRow selected = selectedRow();
-        if (selected == null) return;
-        showForm(selected.getKhach()).ifPresent(guest -> {
-            try {
-                if (khachThamDAO.update(guest)) {
-                    loadFromDatabase(guest.getIdKhach());
-                    info("Cập nhật lượt thăm thành công!");
-                } else warn("Lượt thăm không còn trong MySQL.");
-            } catch (SQLException ex) {
-                showDatabaseError("Không thể sửa lượt khách", ex);
-            }
-        });
+    private static <T,V> void column(TableColumn<T,V> c, Function<T,V> f) {
+        c.setCellValueFactory(x -> new ReadOnlyObjectWrapper<>(f.apply(x.getValue())));
     }
-
-    @FXML
-    private void handleDelete() {
-        KhachThamRow selected = selectedRow();
-        if (selected == null) return;
-        int id = selected.getKhach().getIdKhach();
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                "Xóa lượt #" + id + " của khách " + selected.getKhach().getHoTen()
-                + " khỏi MySQL?", ButtonType.YES, ButtonType.NO);
-        confirm.setTitle("Xác nhận xóa lượt thăm");
-        if (confirm.showAndWait().orElse(ButtonType.NO) != ButtonType.YES) return;
+    private static String fmt(LocalDate d) { return d==null ? "—" : DATE_FMT.format(d); }
+    private static String norm(String s) { return s==null?"":s.trim().toLowerCase(Locale.ROOT); }
+    private static void error(String title, Exception e) {
+        Alert a = new Alert(Alert.AlertType.ERROR);
+        a.setTitle("Lỗi"); a.setHeaderText(title); a.setContentText(e.getMessage()); a.showAndWait();
+    }
+    private static void message(String s) {
+        Alert a = new Alert(Alert.AlertType.INFORMATION,s,ButtonType.OK); a.setHeaderText(null); a.showAndWait();
+    }
+    private static boolean confirm(String s) {
+        Alert a = new Alert(Alert.AlertType.CONFIRMATION,s,ButtonType.YES,ButtonType.NO);
+        a.setHeaderText("Xác nhận thao tác"); return a.showAndWait().orElse(ButtonType.NO)==ButtonType.YES;
+    }
+    private void reloadAll() {
         try {
-            if (khachThamDAO.delete(id)) {
-                loadFromDatabase(-1);
-                info("Xóa lượt thăm thành công!");
-            } else warn("Không tìm thấy lượt thăm cần xóa.");
-        } catch (SQLException ex) {
-            showDatabaseError("Không thể xóa lượt khách", ex);
-        }
+            Integer selectedGuest = tblKhach.getSelectionModel().getSelectedItem()==null ? null : tblKhach.getSelectionModel().getSelectedItem().idKhach();
+            khachData.setAll(khachDao.findAll());
+            luotData.setAll(luotDao.findAll());
+            cboKhach.setItems(FXCollections.observableArrayList(khachData));
+            cboSinhVien.setItems(FXCollections.observableArrayList(luotDao.findSinhVien()));
+            if (selectedGuest != null) khachData.stream().filter(k -> k.idKhach()==selectedGuest)
+                    .findFirst().ifPresent(k -> tblKhach.getSelectionModel().select(k));
+            // So lieu ba the tren cung: toan bo luot, luot trong thang, khach khac nhau trong thang.
+            YearMonth thangHienTai = YearMonth.now();
+            List<LuotDenThamRow> luotThang = luotData.stream()
+                    .filter(v -> v.ngayDen() != null && YearMonth.from(v.ngayDen()).equals(thangHienTai))
+                    .toList();
+            lblTongLuot.setText(String.valueOf(luotData.size()));
+            lblLuotThang.setText(String.valueOf(luotThang.size()));
+            lblKhachThang.setText(String.valueOf(luotThang.stream()
+                    .map(LuotDenThamRow::idKhach).distinct().count()));
+            // Hien thi trang thai dang o KTX rieng trong tab Luot den tham.
+            lblDangTham.setText(String.valueOf(luotData.stream()
+                    .filter(v -> v.thoiGianDen()!=null && v.thoiGianDi()==null).count()));
+            filterKhach(); filterLuot();
+            // Đồng bộ lại thống kê sau mọi thao tác CRUD.
+            traCuuThongKe();
+        } catch (SQLException e) { error("Không thể tải dữ liệu từ MySQL",e); }
+    }
+    @FXML private void lamMoi() { reloadAll(); }
+    private void filterKhach() {
+        String q = norm(txtTimKhach.getText());
+        filteredKhach.setPredicate(k -> norm(k.soCmt()).contains(q) || norm(k.hoTen()).contains(q)
+                || String.valueOf(k.idKhach()).contains(q));
+        lblKhachCount.setText("Hiển thị " + filteredKhach.size() + " / " + khachData.size() + " khách");
+    }
+    private void filterLuot() {
+        String q = norm(txtTimLuot.getText());
+        filteredLuot.setPredicate(v -> norm(v.tenKhach()).contains(q)||norm(v.soCmt()).contains(q)
+                ||norm(v.maSv()).contains(q)||norm(v.tenSv()).contains(q)||String.valueOf(v.idLuot()).contains(q));
+        lblLuotCount.setText("Hiển thị " + filteredLuot.size() + " / " + luotData.size() + " lượt");
     }
 
-    private KhachThamRow selectedRow() {
-        KhachThamRow row = tableVisits.getSelectionModel().getSelectedItem();
-        if (row == null) warn("Hãy chọn một lượt khách trong bảng trước.");
-        return row;
+    @FXML private void themKhach() { guestDialog(null); }
+    @FXML private void suaKhach() {
+        KhachRow k = tblKhach.getSelectionModel().getSelectedItem();
+        if (k==null) { message("Chọn một khách trong bảng trước."); return; }
+        guestDialog(k);
     }
-
-    private Optional<KhachTham> showForm(KhachTham current) {
-        List<SinhVienOption> options;
-        try {
-            options = khachThamDAO.findStudents();
-        } catch (SQLException ex) {
-            showDatabaseError("Không thể tải danh sách sinh viên", ex);
-            return Optional.empty();
-        }
-        if (options.isEmpty()) {
-            warn("Chưa có sinh viên nào trong CSDL. Hãy thêm sinh viên trước.");
-            return Optional.empty();
-        }
-
-        boolean editing = current != null;
-        Dialog<KhachTham> dialog = new Dialog<>();
-        dialog.setTitle(editing ? "Sửa lượt khách đến thăm" : "Ghi nhận khách đến thăm");
-        dialog.setHeaderText("Mỗi bản ghi là một lượt đến thăm sinh viên");
-        ButtonType save = new ButtonType("Lưu vào MySQL", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(save, ButtonType.CANCEL);
-
-        TextField identity = new TextField(editing ? safe(current.getSoCmt()) : "");
-        identity.setPromptText("CMT/CCCD của khách (không bắt buộc duy nhất)");
-        TextField name = new TextField(editing ? safe(current.getHoTen()) : "");
-        name.setPromptText("Họ và tên khách");
-        DatePicker birthday = new DatePicker(editing ? current.getNgaySinh() : null);
-        DatePicker visitDate = new DatePicker(editing ? current.getNgayDenChoi() : LocalDate.now());
-        ComboBox<SinhVienOption> student = new ComboBox<>(FXCollections.observableArrayList(options));
-        student.setMaxWidth(Double.MAX_VALUE);
-        student.setPromptText("Chọn sinh viên được thăm");
-        if (editing) {
-            options.stream().filter(s -> s.maSV().equals(current.getMaSV()))
-                    .findFirst().ifPresent(student::setValue);
-        }
-        GridPane grid = new GridPane();
-        grid.setHgap(12);
-        grid.setVgap(11);
-        grid.setPadding(new Insets(12));
-        grid.addRow(0, new Label("Số CMT/CCCD *"), identity);
-        grid.addRow(1, new Label("Họ tên khách *"), name);
-        grid.addRow(2, new Label("Ngày sinh (tùy chọn)"), birthday);
-        grid.addRow(3, new Label("Ngày đến chơi *"), visitDate);
-        grid.addRow(4, new Label("Sinh viên được thăm *"), student);
-        Label error = new Label();
-        error.setWrapText(true);
-        error.setStyle("-fx-text-fill: #B91C1C;");
-        grid.add(error, 0, 5, 2, 1);
+    private void guestDialog(KhachRow old) {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle(old==null ? "Thêm khách" : "Sửa hồ sơ khách");
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK,ButtonType.CANCEL);
+        TextField cccd = new TextField(old==null?"":old.soCmt());
+        TextField name = new TextField(old==null?"":old.hoTen());
+        DatePicker birth = new DatePicker(old==null?null:old.ngaySinh());
+        GridPane grid = form();
+        grid.addRow(0,new Label("Số CMT/CCCD:"),cccd);
+        grid.addRow(1,new Label("Họ và tên:"),name);
+        grid.addRow(2,new Label("Ngày sinh:"),birth);
         dialog.getDialogPane().setContent(grid);
-        dialog.getDialogPane().setPrefWidth(560);
-
-        Node saveButton = dialog.getDialogPane().lookupButton(save);
-        saveButton.addEventFilter(ActionEvent.ACTION, event -> {
-            String problem = validate(identity.getText(), name.getText(),
-                    birthday.getValue(), visitDate.getValue(), student.getValue());
-            if (problem != null) {
-                error.setText(problem);
-                event.consume();
-            }
-        });
-        dialog.setResultConverter(button -> button == save
-                ? new KhachTham(editing ? current.getIdKhach() : 0,
-                        identity.getText().trim(), name.getText().trim(),
-                        birthday.getValue(), visitDate.getValue(), student.getValue().maSV())
-                : null);
-        return dialog.showAndWait();
+        if (dialog.showAndWait().orElse(ButtonType.CANCEL)!=ButtonType.OK) return;
+        if (cccd.getText().isBlank()||name.getText().isBlank()) { message("CCCD và họ tên không được trống."); return; }
+        try {
+            KhachRow k = new KhachRow(old==null?0:old.idKhach(),cccd.getText().trim(),name.getText().trim(),birth.getValue());
+            if (old==null) khachDao.insert(k); else khachDao.update(k);
+            reloadAll();
+        } catch (SQLException e) { error("Không thể lưu khách (CCCD có thể bị trùng)",e); }
+    }
+    @FXML private void xoaKhach() {
+        KhachRow k = tblKhach.getSelectionModel().getSelectedItem();
+        if (k==null) { message("Chọn một khách trước."); return; }
+        if (!confirm("Xóa hồ sơ " + k.hoTen() + "? Hồ sơ đã có lịch sử thăm sẽ bị MySQL chặn.")) return;
+        try { khachDao.delete(k.idKhach()); reloadAll(); }
+        catch (SQLException e) { error("Không xóa được. Khách có thể đã có lịch sử thăm (ON DELETE RESTRICT).",e); }
     }
 
-    private String validate(String cmt, String name, LocalDate birthday,
-                            LocalDate visitDate, SinhVienOption student) {
-        if (cmt == null || cmt.isBlank() || name == null || name.isBlank()
-                || visitDate == null || student == null)
-            return "Vui lòng điền đầy đủ các trường có dấu *.";
-        if (cmt.trim().length() > 20 || name.trim().length() > 100)
-            return "CMT/CCCD tối đa 20 ký tự; họ tên tối đa 100 ký tự.";
-        if (visitDate.isAfter(LocalDate.now()))
-            return "Ngày đến chơi không được nằm trong tương lai.";
-        if (birthday != null && birthday.isAfter(visitDate))
-            return "Ngày sinh không thể sau ngày đến chơi.";
-        return null;
+    @FXML private void checkIn() {
+        KhachRow k = cboKhach.getValue(); SinhVienOption s = cboSinhVien.getValue();
+        if (k==null||s==null) { message("Chọn khách và sinh viên được thăm trước khi check-in."); return; }
+        if (!confirm("Ghi nhận " + k.hoTen() + " đến thăm " + s.hoTen() + " ngay lúc này?")) return;
+        try { luotDao.checkIn(k.idKhach(),s.maSv()); reloadAll(); }
+        catch (SQLException e) { error("Không check-in được",e); }
     }
-
-    private void warn(String msg) { message(Alert.AlertType.WARNING, "Quản lý khách thăm", msg); }
-    private void info(String msg) { message(Alert.AlertType.INFORMATION, "Quản lý khách thăm", msg); }
-    private void message(Alert.AlertType type, String title, String msg) {
-        Alert alert = new Alert(type, msg, ButtonType.OK);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.showAndWait();
+    @FXML private void checkOut() {
+        LuotDenThamRow v = tblLuot.getSelectionModel().getSelectedItem();
+        if (v==null) { message("Chọn lượt đến thăm trong bảng trước."); return; }
+        if (v.thoiGianDen()==null||v.thoiGianDi()!=null) { message("Chỉ check-out được lượt đã check-in và chưa ra về."); return; }
+        if (!confirm("Xác nhận khách " + v.tenKhach() + " đã rời KTX?")) return;
+        try { luotDao.checkOut(v.idLuot()); reloadAll(); }
+        catch (SQLException e) { error("Không check-out được",e); }
     }
-
-    private void showDatabaseError(String action, SQLException ex) {
-        String detail = switch (ex.getErrorCode()) {
-            case 1062 -> "Bản ghi bị trùng khóa hoặc ràng buộc UNIQUE.";
-            case 1452 -> "Mã sinh viên được thăm không tồn tại.";
-            case 1451 -> "Không thể xóa vì có dữ liệu đang tham chiếu.";
-            default -> "MySQL: " + ex.getMessage();
-        };
-        message(Alert.AlertType.ERROR, "Lỗi MySQL", action + ".\n" + detail);
+    @FXML private void suaLuot() {
+        LuotDenThamRow v = tblLuot.getSelectionModel().getSelectedItem();
+        if (v==null) { message("Chọn một lượt thăm trước."); return; }
+        Dialog<ButtonType> dlg = new Dialog<>(); dlg.setTitle("Sửa lượt đến thăm #"+v.idLuot());
+        dlg.getDialogPane().getButtonTypes().addAll(ButtonType.OK,ButtonType.CANCEL);
+        ComboBox<KhachRow> k = new ComboBox<>(FXCollections.observableArrayList(khachData));
+        k.setMaxWidth(Double.MAX_VALUE);
+        khachData.stream().filter(x -> x.idKhach()==v.idKhach()).findFirst().ifPresent(k::setValue);
+        ComboBox<SinhVienOption> sv = new ComboBox<>(cboSinhVien.getItems());
+        sv.setMaxWidth(Double.MAX_VALUE);
+        sv.getItems().stream().filter(x -> x.maSv().equals(v.maSv())).findFirst().ifPresent(sv::setValue);
+        DatePicker ngay = new DatePicker(v.ngayDen());
+        TextField den = new TextField(v.thoiGianDen()==null?"":EDIT_FMT.format(v.thoiGianDen()));
+        TextField di = new TextField(v.thoiGianDi()==null?"":EDIT_FMT.format(v.thoiGianDi()));
+        den.setPromptText("yyyy-MM-dd HH:mm hoặc để trống");
+        di.setPromptText("yyyy-MM-dd HH:mm hoặc để trống");
+        GridPane g=form(); g.addRow(0,new Label("Khách:"),k);g.addRow(1,new Label("Sinh viên:"),sv);
+        g.addRow(2,new Label("Ngày đến:"),ngay);g.addRow(3,new Label("Giờ đến:"),den);g.addRow(4,new Label("Giờ đi:"),di);
+        dlg.getDialogPane().setContent(g);
+        if (dlg.showAndWait().orElse(ButtonType.CANCEL)!=ButtonType.OK) return;
+        try {
+            if (k.getValue()==null||sv.getValue()==null||ngay.getValue()==null) throw new IllegalArgumentException("Thiếu khách, SV hoặc ngày đến.");
+            LocalDateTime timeDen = den.getText().isBlank()?null:LocalDateTime.parse(den.getText().trim(),EDIT_FMT);
+            LocalDateTime timeDi = di.getText().isBlank()?null:LocalDateTime.parse(di.getText().trim(),EDIT_FMT);
+            if (timeDen==null && timeDi!=null) throw new IllegalArgumentException("Không thể có giờ đi khi thiếu giờ đến.");
+            if (timeDen!=null && !timeDen.toLocalDate().equals(ngay.getValue())) throw new IllegalArgumentException("Ngày đến phải khớp với phần ngày của giờ đến.");
+            if (timeDi!=null && timeDi.isBefore(timeDen)) throw new IllegalArgumentException("Giờ đi không được trước giờ đến.");
+            luotDao.updateVisit(v.idLuot(),k.getValue().idKhach(),sv.getValue().maSv(),ngay.getValue(),timeDen,timeDi);
+            reloadAll();
+        } catch (SQLException | IllegalArgumentException e) { error("Không lưu được lượt đến thăm",e); }
+    }
+    @FXML private void xoaLuot() {
+        LuotDenThamRow v=tblLuot.getSelectionModel().getSelectedItem();
+        if (v==null) { message("Chọn một lượt thăm trước."); return; }
+        if (!confirm("Xóa vĩnh viễn lượt #"+v.idLuot()+"? Hành động này làm thay đổi số liệu thống kê.")) return;
+        try { luotDao.deleteVisit(v.idLuot()); reloadAll(); }
+        catch (SQLException e) { error("Không xóa được lượt thăm",e); }
+    }
+    @FXML private void traCuuThongKe() {
+        try {
+            YearMonth month=YearMonth.parse(txtThang.getText().trim());
+            List<ThongKeKhachRow> rows=thongKeDao.thongKeTheoThang(month);
+            tblThongKe.setItems(FXCollections.observableArrayList(rows));
+            long total=rows.stream().mapToLong(ThongKeKhachRow::soLanDen).sum();
+            lblThongKe.setText("Tháng " + month + "  •  " + rows.size() + " cặp SV–khách  •  Tổng " + total + " lượt thăm");
+        } catch (DateTimeParseException e) { lblThongKe.setText("Tháng không hợp lệ. Nhập YYYY-MM, ví dụ 2026-10."); }
+        catch (SQLException e) { error("Không tải được thống kê",e); }
+    }
+    private static GridPane form() {
+        GridPane g = new GridPane(); g.setHgap(12);g.setVgap(12);g.setPadding(new Insets(16));return g;
     }
 }

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!-- Nội dung trang, MainView.fxml đã vẽ sidebar và tiêu đề lớn. -->
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.ptit.quanlyktx.controller.ThongKeController"
+      stylesheets="@../css/thongke.css"
+      spacing="14" styleClass="tk-page">
+    <padding><Insets top="16" right="20" bottom="18" left="20"/></padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <VBox spacing="4" HBox.hgrow="ALWAYS">
+            <Label text="BÁO CÁO DOANH THU DỊCH VỤ" styleClass="tk-eyebrow"/>
+            <Label text="Theo dõi doanh thu phát sinh và tần suất sử dụng theo tháng" styleClass="tk-hint"/>
+        </VBox>
+        <Button text="↻  Làm mới" onAction="#lamMoi" styleClass="tk-btn-outline"/>
+    </HBox>
+
+    <HBox spacing="12">
+        <VBox spacing="6" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="tk-kpi, tk-kpi-blue">
+            <Label text="◆  Tổng doanh thu dịch vụ" styleClass="tk-kpi-name"/>
+            <Label fx:id="lblTongDoanhThu" text="—" styleClass="tk-kpi-value, tk-blue"/>
+            <Label fx:id="lblKyDoanhThu" text="Theo tháng đã chọn" styleClass="tk-sub"/>
+        </VBox>
+        <VBox spacing="6" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="tk-kpi, tk-kpi-green">
+            <Label text="◷  Lượt sử dụng" styleClass="tk-kpi-name"/>
+            <Label fx:id="lblTongLuot" text="—" styleClass="tk-kpi-value, tk-green"/>
+            <Label text="Số giao dịch phát sinh" styleClass="tk-sub"/>
+        </VBox>
+        <VBox spacing="6" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="tk-kpi, tk-kpi-amber">
+            <Label text="▥  Dịch vụ có doanh thu" styleClass="tk-kpi-name"/>
+            <Label fx:id="lblDvCoDoanhThu" text="—" styleClass="tk-kpi-value, tk-amber"/>
+            <Label text="Trên tổng danh mục dịch vụ" styleClass="tk-sub"/>
+        </VBox>
+    </HBox>
+
+    <HBox alignment="CENTER_LEFT" spacing="10" styleClass="tk-filter-panel">
+        <Label text="Tháng thống kê (YYYY-MM)" styleClass="tk-filter-label"/>
+        <TextField fx:id="txtThang" promptText="Ví dụ: 2026-10"
+                   prefWidth="160" onAction="#traCuu" styleClass="tk-input"/>
+        <Button text="Tra cứu" onAction="#traCuu" styleClass="tk-btn-primary"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="lblThangDaXem" text="" styleClass="tk-thang-pill"/>
+    </HBox>
+
+    <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS" styleClass="tk-tabs">
+        <tabs>
+            <Tab text="Bảng doanh thu">
+                <VBox spacing="10" styleClass="tk-panel">
+                    <HBox alignment="CENTER_LEFT" spacing="12">
+                        <Label text="Doanh thu từng dịch vụ" styleClass="tk-panel-title" HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="lblDemDv" text="0 dịch vụ" styleClass="tk-pill"/>
+                    </HBox>
+                    <Label text="Danh mục gồm cả dịch vụ không phát sinh giao dịch trong tháng (doanh thu = 0)." styleClass="tk-hint"/>
+                    <TableView fx:id="tblDoanhThu" prefHeight="400" VBox.vgrow="ALWAYS" styleClass="tk-table">
+                        <placeholder><Label text="Không có dịch vụ trong danh mục"/></placeholder>
+                        <columns>
+                            <TableColumn fx:id="colMaDv" text="Mã DV" prefWidth="120"/>
+                            <TableColumn fx:id="colTenDv" text="Tên dịch vụ" prefWidth="240"/>
+                            <TableColumn fx:id="colDonGia" text="Đơn giá" prefWidth="125"/>
+                            <TableColumn fx:id="colSoLuot" text="Số lượt" prefWidth="85"/>
+                            <TableColumn fx:id="colSoLuong" text="Tổng số lượng" prefWidth="140"/>
+                            <TableColumn fx:id="colDoanhThu" text="Doanh thu" prefWidth="155"/>
+                        </columns>
+                    </TableView>
+                    <HBox alignment="CENTER_LEFT" spacing="10" styleClass="tk-total">
+                        <Label fx:id="lblSoDong" text="Hiển thị: 0 dịch vụ" styleClass="tk-hint" HBox.hgrow="ALWAYS"/>
+                        <Label text="Tổng lượt:" styleClass="tk-hint"/>
+                        <Label fx:id="lblTongLuotBang" text="0" styleClass="tk-total-count"/>
+                        <Label text="Tổng doanh thu:" styleClass="tk-hint"/>
+                        <Label fx:id="lblTongBang" text="0 đ" styleClass="tk-total-money"/>
+                    </HBox>
+                </VBox>
+            </Tab>
+            <Tab text="Biểu đồ doanh thu">
+                <VBox spacing="10" styleClass="tk-panel">
+                    <HBox alignment="CENTER_LEFT" spacing="12">
+                        <Label text="Cơ cấu doanh thu theo dịch vụ" styleClass="tk-panel-title" HBox.hgrow="ALWAYS"/>
+                        <Label text="Hiển thị" styleClass="tk-hint"/>
+                        <ComboBox fx:id="cboPhamVi" prefWidth="125" styleClass="tk-combo"/>
+                    </HBox>
+                    <Label text="Top 5 / Top 10 hoặc tất cả. Khi có nhiều dịch vụ, kéo thanh cuộn để xem thêm." styleClass="tk-hint"/>
+                    <Label fx:id="lblBieuDoRong" text="" styleClass="tk-chart-note"/>
+                    <StackPane VBox.vgrow="ALWAYS" styleClass="tk-chart-frame">
+                        <ScrollPane fx:id="scrollBieuDo" fitToWidth="true" hbarPolicy="NEVER"
+                                    vbarPolicy="AS_NEEDED" prefHeight="440" styleClass="tk-chart-scroll">
+                            <content>
+                                <BarChart fx:id="chartDoanhThu" animated="false" legendVisible="false"
+                                          title="" barGap="2" categoryGap="14"
+                                          minHeight="380" prefHeight="440">
+                                    <xAxis><NumberAxis fx:id="axisTien" label="Doanh thu (VNĐ)"/></xAxis>
+                                    <yAxis><CategoryAxis fx:id="axisDichVu"/></yAxis>
+                                </BarChart>
+                            </content>
+                        </ScrollPane>
+                        <Label fx:id="lblBieuDoTrong" text="Tháng này chưa phát sinh doanh thu dịch vụ"
+                               styleClass="tk-empty" visible="false" managed="false"/>
+                    </StackPane>
+                </VBox>
+            </Tab>
+        </tabs>
+    </TabPane>
+    <Label fx:id="lblTrangThai" text="" styleClass="tk-footer-status"/>
+</VBox>

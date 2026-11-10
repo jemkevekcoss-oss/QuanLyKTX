@@ -144,7 +144,11 @@ public class MainController {
        loadPage("HoaDonView.fxml", "Hóa đơn thanh toán");
     }
 
-    @FXML private void showReports() {
-        showPlaceholder("Thống kê và báo cáo", "Thống kê doanh thu dịch vụ, khách thăm và các khoản phải thu.");
+//    @FXML private void showReports() {
+//        showPlaceholder("Thống kê và báo cáo", "Thống kê doanh thu dịch vụ, khách thăm và các khoản phải thu.");
+//    }
+    @FXML
+    private void showReports() {
+        loadPage("ThongKeView.fxml", "Thống kê và báo cáo");
     }
 }

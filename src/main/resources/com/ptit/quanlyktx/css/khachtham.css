@@ -1,67 +1,150 @@
-/* Rieng trang Khach tham; khong can sua style.css da co */
-.visitor-page {
-    -fx-background-color: transparent;
+/* KTX - Khach tham, phien ban 3.0 | JavaFX 21+.
+   CSS chi pham vi kt-page, khong sua style.css cua ung dung. */
+.kt-page {
     -fx-font-family: "Segoe UI", "Arial";
-}
-.visitor-stat-card, .visitor-panel {
-    -fx-background-color: white;
-    -fx-background-radius: 11;
-    -fx-border-color: #DFE7F1;
-    -fx-border-radius: 11;
-    -fx-border-width: 1;
-}
-.visitor-stat-card { -fx-padding: 16 18; -fx-min-height: 85; }
-.visitor-panel { -fx-padding: 16 18; }
-.visitor-caption { -fx-text-fill: #59728D; -fx-font-size: 12px; }
-.visitor-stat-value { -fx-text-fill: #1C60D1; -fx-font-weight: bold; -fx-font-size: 25px; }
-.visitor-title { -fx-text-fill: #132941; -fx-font-weight: bold; -fx-font-size: 17px; }
-.visitor-count { -fx-text-fill: #6C829E; -fx-font-size: 11px; }
-.visitor-detail { -fx-text-fill: #38516E; -fx-font-size: 12px; }
-.visitor-primary-button {
-    -fx-background-color: #2465E8;
-    -fx-text-fill: white;
-    -fx-background-radius: 6;
-    -fx-padding: 9 13;
-    -fx-font-weight: bold;
-    -fx-cursor: hand;
-}
-.visitor-primary-button:hover { -fx-background-color: #1958D0; }
-.visitor-normal-button {
-    -fx-background-color: #F8FAFE;
-    -fx-text-fill: #223B59;
-    -fx-background-radius: 6;
-    -fx-border-color: #CBD6E6;
-    -fx-border-radius: 6;
-    -fx-padding: 9 12;
-    -fx-cursor: hand;
-}
-.visitor-normal-button:hover { -fx-background-color: #E8F1FF; }
-.visitor-page .text-field, .visitor-page .combo-box {
-    -fx-background-color: white;
-    -fx-background-radius: 6;
-    -fx-border-color: #CBD6E6;
-    -fx-border-radius: 6;
-}
-.visitor-page .text-field:focused, .visitor-page .combo-box:focused {
-    -fx-border-color: #2465E8;
-}
-.visitor-table { -fx-background-color: white; -fx-border-color: #D8E2EE; }
-.visitor-table .column-header-background { -fx-background-color: #EAF1FB; }
-.visitor-table .column-header {
     -fx-background-color: transparent;
-    -fx-border-color: transparent #DEE6F0 transparent transparent;
 }
-.visitor-table .column-header .label {
-    -fx-font-size: 12px;
-    -fx-text-fill: #183251;
+.kt-page .label { -fx-text-fill: #17365A; }
+.kt-eyebrow { -fx-font-size: 12px; -fx-text-fill: #4E719D; -fx-font-weight: bold; }
+.kt-description { -fx-font-size: 12px; -fx-text-fill: #8297B4; }
+
+/* Ba the co nen pastel, border va so thong ke noi bat. */
+.kt-stat-card {
+    -fx-background-radius: 14;
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+    -fx-padding: 15 20;
+    -fx-min-height: 108;
+}
+.kt-card-blue { -fx-background-color: #EAF1FF; -fx-border-color: #CFE0FF; }
+.kt-card-green { -fx-background-color: #E6F7F1; -fx-border-color: #C8EDDF; }
+.kt-card-amber { -fx-background-color: #FFF3E6; -fx-border-color: #F8DEC0; }
+.kt-page .kt-stat-icon { -fx-text-fill: #5A81B6; -fx-font-size: 13px; }
+.kt-page .kt-stat-name { -fx-text-fill: #5D7697; -fx-font-size: 12px; }
+.kt-page .kt-stat-number { -fx-font-size: 30px; -fx-font-weight: bold; }
+.kt-page .kt-blue-text { -fx-text-fill: #195BC8; }
+.kt-page .kt-green-text { -fx-text-fill: #00846C; }
+.kt-page .kt-amber-text { -fx-text-fill: #B06A13; }
+.kt-page .kt-stat-note { -fx-text-fill: #7E92A9; -fx-font-size: 11px; }
+
+/* Tabs: vien xanh duoi tab duoc chon, dong deu voi cac man hinh khac. */
+.kt-tabs { -fx-background-color: transparent; -fx-tab-min-height: 39; }
+.kt-tabs > .tab-header-area { -fx-padding: 0 0 0 0; }
+.kt-tabs > .tab-header-area > .tab-header-background { -fx-background-color: transparent; }
+.kt-tabs > .tab-header-area .tab {
+    -fx-background-color: #EAF0F8;
+    -fx-background-radius: 9 9 0 0;
+    -fx-border-color: transparent transparent #E1E9F4 transparent;
+    -fx-border-width: 0 0 2 0;
+    -fx-padding: 8 17;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-cursor: hand;
+}
+.kt-tabs > .tab-header-area .tab:hover { -fx-background-color: #DEEAFE; }
+.kt-tabs > .tab-header-area .tab:selected {
+    -fx-background-color: #DDEBFF;
+    -fx-border-color: transparent transparent #2563EB transparent;
+}
+.kt-tabs > .tab-header-area .tab .tab-label {
+    -fx-text-fill: #506D93;
     -fx-font-weight: bold;
-}
-.visitor-table .table-cell {
     -fx-font-size: 12px;
-    -fx-text-fill: #213C5B;
-    -fx-padding: 6 8;
 }
-.visitor-table .table-row-cell:odd { -fx-background-color: #F8FAFE; }
-.visitor-table .table-row-cell:even { -fx-background-color: white; }
-.visitor-table .table-row-cell:selected { -fx-background-color: #D7E8FF; }
-.visitor-table .table-row-cell:selected .table-cell { -fx-text-fill: #123B76; }
+.kt-tabs > .tab-header-area .tab:selected .tab-label { -fx-text-fill: #1257C7; }
+.kt-tabs > .tab-content-area { -fx-background-color: transparent; }
+
+/* Panel chung cua ba tab. */
+.kt-panel {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 13;
+    -fx-border-color: #DCE5F2;
+    -fx-border-radius: 13;
+    -fx-border-width: 1;
+    -fx-padding: 18 20 16 20;
+}
+.kt-page .kt-panel-title { -fx-text-fill: #142D4D; -fx-font-size: 18px; -fx-font-weight: bold; }
+.kt-page .kt-hint { -fx-text-fill: #8296B1; -fx-font-size: 12px; }
+.kt-page .kt-summary { -fx-text-fill: #00846C; -fx-font-weight: bold; -fx-font-size: 12px; }
+.kt-page .kt-field-label { -fx-text-fill: #486A96; -fx-font-size: 12px; -fx-font-weight: bold; }
+.kt-filter-box { -fx-background-color: #F2F6FE; -fx-background-radius: 8; -fx-padding: 11 13; }
+.kt-active-flag {
+    -fx-background-color: #E6F8EF;
+    -fx-background-radius: 20;
+    -fx-padding: 6 12;
+    -fx-border-color: #C7EADA;
+    -fx-border-radius: 20;
+}
+.kt-page .kt-active-label, .kt-page .kt-active-count { -fx-text-fill: #087D60; -fx-font-size: 12px; -fx-font-weight: bold; }
+
+/* Buttons, hover, focus. */
+.kt-page .kt-button-primary,
+.kt-page .kt-button-green,
+.kt-page .kt-button-soft,
+.kt-page .kt-button-danger,
+.kt-page .kt-button-outline {
+    -fx-background-radius: 7;
+    -fx-border-radius: 7;
+    -fx-padding: 10 14;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+.kt-page .kt-button-primary { -fx-background-color: #2563EB; -fx-text-fill: white; }
+.kt-page .kt-button-primary:hover { -fx-background-color: #154CC6; }
+.kt-page .kt-button-green { -fx-background-color: #07977F; -fx-text-fill: white; }
+.kt-page .kt-button-green:hover { -fx-background-color: #067964; }
+.kt-page .kt-button-soft { -fx-background-color: #EAF1FE; -fx-text-fill: #2459AF; }
+.kt-page .kt-button-soft:hover { -fx-background-color: #D6E5FF; }
+.kt-page .kt-button-danger { -fx-background-color: #FFF2F2; -fx-text-fill: #C03737; -fx-border-color: #F7CECE; }
+.kt-page .kt-button-danger:hover { -fx-background-color: #FFE1E1; }
+.kt-page .kt-button-outline { -fx-background-color: white; -fx-text-fill: #406996; -fx-border-color: #C9D9EF; }
+.kt-page .kt-button-outline:hover { -fx-background-color: #EAF2FF; }
+
+.kt-page .text-field, .kt-page .combo-box {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #C9D8EA;
+    -fx-background-radius: 7;
+    -fx-border-radius: 7;
+    -fx-font-size: 12px;
+}
+.kt-page .text-field { -fx-padding: 8 12; }
+.kt-page .combo-box { -fx-padding: 0 5 0 3; }
+.kt-page .text-field:focused, .kt-page .combo-box:focused { -fx-border-color: #2563EB; -fx-border-width: 1.4; }
+.kt-page .text-field .text, .kt-page .combo-box .list-cell { -fx-fill: #17365A; -fx-text-fill: #17365A; }
+
+/* TableView: dong mau cua tat ca 3 bang, khac phuc header xam he thong. */
+.kt-table {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D5E1EF;
+    -fx-border-width: 1;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-fixed-cell-size: 34;
+    -fx-table-cell-border-color: #E3EAF4;
+    -fx-selection-bar: #D8E9FF;
+    -fx-selection-bar-non-focused: #E2EEFE;
+}
+.kt-table .column-header-background { -fx-background-color: #E8F1FC; }
+.kt-table .filler { -fx-background-color: #E8F1FC; }
+.kt-table .column-header {
+    -fx-background-color: #E8F1FC;
+    -fx-border-color: transparent #D6E2F2 #D6E2F2 transparent;
+    -fx-border-width: 0 1 1 0;
+    -fx-pref-height: 32;
+}
+.kt-table .column-header .label { -fx-text-fill: #12345D; -fx-font-size: 12px; -fx-font-weight: bold; }
+.kt-table .table-row-cell { -fx-border-color: transparent; }
+.kt-table .table-row-cell:even { -fx-background-color: #FFFFFF; }
+.kt-table .table-row-cell:odd { -fx-background-color: #F5F8FD; }
+.kt-table .table-row-cell:hover { -fx-background-color: #EAF3FF; }
+.kt-table .table-row-cell:selected { -fx-background-color: #D7E8FD; }
+.kt-table .table-row-cell:selected:focused { -fx-background-color: #D7E8FD; }
+.kt-table .table-cell { -fx-font-size: 12px; -fx-text-fill: #24476E; -fx-padding: 5 9; -fx-alignment: CENTER_LEFT; }
+.kt-table .table-row-cell:selected .table-cell { -fx-text-fill: #12417D; }
+.kt-table .table-cell.kt-status-active { -fx-text-fill: #007A5D; -fx-font-weight: bold; }
+.kt-table .table-cell.kt-status-closed { -fx-text-fill: #53708E; }
+.kt-table .table-cell.kt-status-unknown { -fx-text-fill: #A36A22; }
+.kt-table .placeholder .label { -fx-text-fill: #8398B1; -fx-font-size: 12px; }
+.kt-table .scroll-bar .thumb { -fx-background-color: #B8C8D8; -fx-background-radius: 5; }
+.kt-table .scroll-bar .track { -fx-background-color: #F3F6FA; }
