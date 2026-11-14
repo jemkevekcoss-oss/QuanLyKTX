@@ -57,3 +57,177 @@
 .room-badge-full { -fx-text-fill: #B42318; -fx-font-weight: bold; }
 .room-badge-open { -fx-text-fill: #16803C; -fx-font-weight: bold; }
 .room-badge-empty { -fx-text-fill: #687588; -fx-font-weight: bold; }
+
+
+/* ======================================================================
+   Dialog thêm / sửa / xem chi tiết: dùng riêng cho module Phòng ở.
+   Không tác động CSS các module khác hoặc nghiệp vụ SQLite.
+   ====================================================================== */
+.room-dialog-pane {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 13;
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+}
+.room-dialog-pane > .content { -fx-padding: 0; }
+.room-dialog-pane > .button-bar > .container {
+    -fx-padding: 13 29 23 29;
+    -fx-background-color: #FFFFFF;
+}
+.room-dialog-content {
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 27 30 13 30;
+}
+.room-dialog-header { -fx-padding: 0 0 5 0; }
+.room-form-mark {
+    -fx-background-color: #E8F0FF;
+    -fx-background-radius: 13;
+    -fx-min-width: 48; -fx-min-height: 48;
+    -fx-pref-width: 48; -fx-pref-height: 48;
+    -fx-alignment: CENTER;
+    -fx-text-fill: #2563EB;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+.room-dialog-title {
+    -fx-text-fill: #14263D;
+    -fx-font-size: 21px;
+    -fx-font-weight: bold;
+}
+.room-dialog-description {
+    -fx-text-fill: #788CA6;
+    -fx-font-size: 12px;
+}
+.room-dialog-banner {
+    -fx-background-color: #EDF4FF;
+    -fx-background-radius: 10;
+    -fx-padding: 12 14;
+}
+.room-hint-icon {
+    -fx-background-color: #2A69D6;
+    -fx-background-radius: 50;
+    -fx-pref-width: 20; -fx-pref-height: 20;
+    -fx-min-width: 20; -fx-min-height: 20;
+    -fx-alignment: CENTER;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+.room-dialog-banner-label {
+    -fx-text-fill: #315F9C;
+    -fx-font-size: 12px;
+}
+.room-dialog-section-label {
+    -fx-text-fill: #2F547F;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 2 0 0 0;
+}
+.room-field-label {
+    -fx-text-fill: #35516F;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+.room-field-required { -fx-text-fill: #D14E54; -fx-font-size: 13px; }
+.room-field-input {
+    -fx-background-color: white;
+    -fx-border-color: #CCD9E9;
+    -fx-border-width: 1;
+    -fx-border-radius: 9;
+    -fx-background-radius: 9;
+    -fx-font-size: 13px;
+    -fx-text-fill: #1E3755;
+    -fx-prompt-text-fill: #A3B0C2;
+    -fx-padding: 11 15;
+    -fx-pref-height: 44;
+}
+.room-field-input:focused {
+    -fx-border-color: #2F70E8;
+    -fx-effect: dropshadow(gaussian, rgba(37,99,235,0.10), 6, 0, 0, 1);
+}
+.room-field-readonly {
+    -fx-background-color: #F2F5FA;
+    -fx-text-fill: #49617F;
+    -fx-border-color: #DFE6F1;
+}
+.room-validation-error {
+    -fx-background-color: #FFF1F2;
+    -fx-background-radius: 8;
+    -fx-padding: 12 14;
+    -fx-text-fill: #B43442;
+    -fx-font-size: 12px;
+}
+.room-btn-primary, .room-btn-secondary {
+    -fx-background-radius: 9;
+    -fx-border-radius: 9;
+    -fx-padding: 11 20;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-min-width: 120;
+    -fx-cursor: hand;
+}
+.room-btn-primary { -fx-background-color: #2563EB; -fx-text-fill: white; }
+.room-btn-primary:hover { -fx-background-color: #1D4ED8; }
+.room-btn-secondary { -fx-background-color: #EFF3FA; -fx-text-fill: #526A88; }
+.room-btn-secondary:hover { -fx-background-color: #E1E9F5; }
+.room-detail-summary {
+    -fx-background-color: #EDF4FF;
+    -fx-background-radius: 9;
+    -fx-padding: 14 17;
+    -fx-text-fill: #315F9C;
+    -fx-font-size: 13px;
+}
+
+/* Thông báo tiếng Việt: thành công, cảnh báo, lỗi, xác nhận xóa. */
+.room-message-pane {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 13;
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+}
+.room-message-pane > .content { -fx-padding: 0; }
+.room-message-pane > .button-bar > .container {
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 4 26 23 26;
+}
+.room-message-content { -fx-padding: 27 27 19 27; }
+.room-message-title {
+    -fx-text-fill: #152B49;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+.room-message-body { -fx-text-fill: #425A77; -fx-font-size: 13px; }
+.room-message-rule { -fx-background-color: #E5EBF3; -fx-pref-height: 1; }
+.room-message-icon {
+    -fx-alignment: CENTER;
+    -fx-background-radius: 12;
+    -fx-pref-height: 48; -fx-pref-width: 48;
+    -fx-min-height: 48; -fx-min-width: 48;
+    -fx-font-size: 25px;
+    -fx-font-weight: bold;
+}
+.room-message-success .room-message-icon {
+    -fx-background-color: #E4F6EE; -fx-text-fill: #087B55;
+}
+.room-message-warning .room-message-icon {
+    -fx-background-color: #FFF2DA; -fx-text-fill: #B8790C;
+}
+.room-message-error .room-message-icon {
+    -fx-background-color: #FDE8EA; -fx-text-fill: #C43945;
+}
+.room-message-confirm .room-message-icon {
+    -fx-background-color: #E8F0FF; -fx-text-fill: #2563EB;
+}
+.room-message-primary, .room-message-secondary, .room-message-danger-button {
+    -fx-background-radius: 9;
+    -fx-border-radius: 9;
+    -fx-padding: 10 20;
+    -fx-min-width: 106;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+.room-message-primary { -fx-background-color: #2563EB; -fx-text-fill: white; }
+.room-message-primary:hover { -fx-background-color: #1D4ED8; }
+.room-message-secondary { -fx-background-color: #EFF3FA; -fx-text-fill: #526A88; }
+.room-message-secondary:hover { -fx-background-color: #E1E9F5; }
+.room-message-danger-button { -fx-background-color: #DC3545; -fx-text-fill: white; }
+.room-message-danger-button:hover { -fx-background-color: #BA2635; }

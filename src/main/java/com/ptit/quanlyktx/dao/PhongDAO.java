@@ -6,7 +6,6 @@ import com.ptit.quanlyktx.model.Phong;
 import com.ptit.quanlyktx.model.SinhVien;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,7 +13,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Truy vấn và CRUD bảng PHONG bằng JDBC. */
+/** Truy vấn và CRUD bảng PHONG bằng SQLite JDBC. */
 public class PhongDAO {
 
     /** Danh sách tất cả phòng, kể cả phòng chưa có sinh viên. */
@@ -27,10 +26,12 @@ public class PhongDAO {
             GROUP BY p.so_phong, p.loai_phong, p.don_gia, p.so_nguoi_toi_da
             ORDER BY p.so_phong
             """;
+
         List<PhongThongKe> result = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
+
             while (rs.next()) {
                 Phong phong = new Phong(
                     rs.getString("so_phong"),
@@ -38,7 +39,9 @@ public class PhongDAO {
                     rs.getBigDecimal("don_gia"),
                     rs.getInt("so_nguoi_toi_da")
                 );
-                result.add(new PhongThongKe(phong, rs.getInt("so_nguoi_dang_o")));
+                result.add(new PhongThongKe(
+                    phong, rs.getInt("so_nguoi_dang_o")
+                ));
             }
         }
         return result;
@@ -53,21 +56,23 @@ public class PhongDAO {
             WHERE so_phong = ?
             ORDER BY ma_sv
             """;
+
         List<SinhVien> result = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, soPhong);
+
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     result.add(new SinhVien(
                         rs.getString("ma_sv"),
                         rs.getString("so_cmt"),
                         rs.getString("ho_ten"),
-                        asLocalDate(rs.getDate("ngay_sinh")),
+                        asLocalDate(rs.getString("ngay_sinh")),
                         rs.getString("lop"),
                         rs.getString("que_quan"),
                         rs.getString("so_phong"),
-                        asLocalDate(rs.getDate("ngay_vao_o"))
+                        asLocalDate(rs.getString("ngay_vao_o"))
                     ));
                 }
             }
@@ -75,11 +80,13 @@ public class PhongDAO {
         return result;
     }
 
+    /** Thêm phòng mới. */
     public boolean insert(Phong phong) throws SQLException {
         final String sql = """
             INSERT INTO PHONG (so_phong, loai_phong, don_gia, so_nguoi_toi_da)
             VALUES (?, ?, ?, ?)
             """;
+
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, phong.getSoPhong());
@@ -91,66 +98,72 @@ public class PhongDAO {
     }
 
     /**
-     * Khóa phòng và kiểm tra số sinh viên trong cùng transaction khi giảm sức chứa.
-     * Bảng SINH_VIEN cần FK tới PHONG để khóa hàng cha ngăn các lần chuyển phòng
-     * đồng thời; nên bổ sung trigger/kiểm soát DB để bảo vệ mọi đường ghi dữ liệu.
+     * Sửa phòng và ngăn giảm sức chứa thấp hơn số sinh viên đang ở.
+     * SQLite không hỗ trợ SELECT ... FOR UPDATE như MySQL.
+     * Điều kiện kiểm tra trong chính câu UPDATE giúp thao tác kiểm tra và ghi
+     * được thực hiện nguyên tử, không phải dùng commit/rollback riêng.
      */
     public boolean update(Phong phong) throws SQLException {
-        final String lockSql = "SELECT so_phong FROM PHONG WHERE so_phong = ? FOR UPDATE";
-        final String countSql = "SELECT COUNT(*) FROM SINH_VIEN WHERE so_phong = ?";
         final String updateSql = """
-            UPDATE PHONG SET loai_phong = ?, don_gia = ?, so_nguoi_toi_da = ?
+            UPDATE PHONG
+            SET loai_phong = ?, don_gia = ?, so_nguoi_toi_da = ?
+            WHERE so_phong = ?
+              AND (
+                  SELECT COUNT(*)
+                  FROM SINH_VIEN
+                  WHERE SINH_VIEN.so_phong = PHONG.so_phong
+              ) <= ?
+            """;
+        final String checkSql = """
+            SELECT COUNT(*) AS dang_o
+            FROM SINH_VIEN
             WHERE so_phong = ?
             """;
+        final String existsSql = "SELECT 1 FROM PHONG WHERE so_phong = ?";
+
         try (Connection conn = DatabaseConnection.getConnection()) {
-            conn.setAutoCommit(false);
-            try {
-                try (PreparedStatement ps = conn.prepareStatement(lockSql)) {
-                    ps.setString(1, phong.getSoPhong());
-                    try (ResultSet rs = ps.executeQuery()) {
-                        if (!rs.next()) {
-                            conn.rollback();
-                            return false;
+            try (PreparedStatement ps = conn.prepareStatement(updateSql)) {
+                ps.setString(1, phong.getLoaiPhong());
+                ps.setBigDecimal(2, phong.getDonGia());
+                ps.setInt(3, phong.getSoNguoiToiDa());
+                ps.setString(4, phong.getSoPhong());
+                ps.setInt(5, phong.getSoNguoiToiDa());
+
+                if (ps.executeUpdate() == 1) {
+                    return true;
+                }
+            }
+
+            // UPDATE không tác động dòng nào: phòng không tồn tại hoặc sức chứa quá nhỏ.
+            try (PreparedStatement ps = conn.prepareStatement(existsSql)) {
+                ps.setString(1, phong.getSoPhong());
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (!rs.next()) {
+                        return false;
+                    }
+                }
+            }
+
+            try (PreparedStatement ps = conn.prepareStatement(checkSql)) {
+                ps.setString(1, phong.getSoPhong());
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        int dangO = rs.getInt("dang_o");
+                        if (phong.getSoNguoiToiDa() < dangO) {
+                            throw new SQLException(
+                                "Không thể giảm sức chứa xuống " + phong.getSoNguoiToiDa()
+                                + ": phòng đang có " + dangO + " sinh viên.",
+                                "45000"
+                            );
                         }
                     }
                 }
-
-                int currentOccupants;
-                try (PreparedStatement ps = conn.prepareStatement(countSql)) {
-                    ps.setString(1, phong.getSoPhong());
-                    try (ResultSet rs = ps.executeQuery()) {
-                        rs.next();
-                        currentOccupants = rs.getInt(1);
-                    }
-                }
-                if (phong.getSoNguoiToiDa() < currentOccupants) {
-                    throw new SQLException(
-                        "Không thể giảm sức chứa xuống " + phong.getSoNguoiToiDa()
-                        + ": phòng đang có " + currentOccupants + " sinh viên.",
-                        "45000"
-                    );
-                }
-
-                int changed;
-                try (PreparedStatement ps = conn.prepareStatement(updateSql)) {
-                    ps.setString(1, phong.getLoaiPhong());
-                    ps.setBigDecimal(2, phong.getDonGia());
-                    ps.setInt(3, phong.getSoNguoiToiDa());
-                    ps.setString(4, phong.getSoPhong());
-                    changed = ps.executeUpdate();
-                }
-                conn.commit();
-                // MySQL có thể trả 0 nếu dữ liệu được lưu không thay đổi.
-                return changed >= 0;
-            } catch (SQLException | RuntimeException ex) {
-                try { conn.rollback(); }
-                catch (SQLException rollbackError) { ex.addSuppressed(rollbackError); }
-                throw ex;
             }
+            return false;
         }
     }
 
-    /** FK từ SINH_VIEN sẽ chặn xóa phòng đang được tham chiếu. */
+    /** FK từ SINH_VIEN sẽ chặn xóa phòng đang có người (foreign_keys = ON). */
     public boolean delete(String soPhong) throws SQLException {
         final String sql = "DELETE FROM PHONG WHERE so_phong = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -160,7 +173,8 @@ public class PhongDAO {
         }
     }
 
-    private static LocalDate asLocalDate(Date date) {
-        return date == null ? null : date.toLocalDate();
+    /** Ngày trong SQLite được lưu dưới dạng chuỗi YYYY-MM-DD. */
+    private static LocalDate asLocalDate(String value) {
+        return value == null ? null : LocalDate.parse(value);
     }
 }

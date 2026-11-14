@@ -2,6 +2,7 @@ package com.ptit.quanlyktx.controller;
 
 import com.ptit.quanlyktx.dao.ThongKeDAO;
 import com.ptit.quanlyktx.dto.DoanhThuDichVuRow;
+import com.ptit.quanlyktx.dto.TopSinhVienDichVuRow;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
@@ -63,6 +64,14 @@ public class ThongKeController {
     @FXML private NumberAxis axisTien;
     @FXML private CategoryAxis axisDichVu;
 
+    // Bảng xếp hạng bổ sung, độc lập với bảng doanh thu và biểu đồ hiện tại.
+    @FXML private ComboBox<String> cboTopGioiHan, cboTopTieuChi;
+    @FXML private Label lblTopKy, lblTopMoTa, lblTopSoDong, lblTopTongTien, lblTopTrangThai;
+    @FXML private TableView<TopSinhVienDichVuRow> tblTopSinhVien;
+    @FXML private TableColumn<TopSinhVienDichVuRow, Integer> colTopThuHang, colTopSoLuot;
+    @FXML private TableColumn<TopSinhVienDichVuRow, String> colTopMaSv, colTopHoTen;
+    @FXML private TableColumn<TopSinhVienDichVuRow, BigDecimal> colTopTongTien;
+
     private final ThongKeDAO dao = new ThongKeDAO();
     private final List<DoanhThuDichVuRow> duLieu = new ArrayList<>();
     private YearMonth thangDangXem;
@@ -70,9 +79,18 @@ public class ThongKeController {
     @FXML
     private void initialize() {
         thietLapBang();
+        thietLapBangTopSinhVien();
         cboPhamVi.getItems().setAll("Top 5", "Top 10", "Tất cả");
         cboPhamVi.getSelectionModel().select("Top 5");
         cboPhamVi.valueProperty().addListener((obs, cu, moi) -> capNhatBieuDo());
+
+        // Tab mới chỉ có hai mức Top 5/Top 10, không thay đổi cboPhamVi của biểu đồ.
+        cboTopGioiHan.getItems().setAll("Top 5", "Top 10");
+        cboTopGioiHan.getSelectionModel().select("Top 5");
+        cboTopTieuChi.getItems().setAll("Tổng tiền dịch vụ", "Số lượt sử dụng");
+        cboTopTieuChi.getSelectionModel().select("Tổng tiền dịch vụ");
+        cboTopGioiHan.valueProperty().addListener((obs, cu, moi) -> capNhatTopSinhVien());
+        cboTopTieuChi.valueProperty().addListener((obs, cu, moi) -> capNhatTopSinhVien());
 
         chartDoanhThu.setAnimated(false);
         chartDoanhThu.setLegendVisible(false);
@@ -94,7 +112,7 @@ public class ThongKeController {
             YearMonth ganNhat = dao.findThangGanNhatCoSuDung();
             if (ganNhat != null) khoiDau = ganNhat;
         } catch (SQLException ex) {
-            // Lệnh Tra cứu sẽ hiển thị thông báo kết nối nếu MySQL không sẵn sàng.
+            // Lệnh Tra cứu sẽ hiển thị thông báo nếu không đọc được dữ liệu SQLite.
         }
         txtThang.setText(khoiDau.toString());
         traCuu();
@@ -165,10 +183,12 @@ public class ThongKeController {
             tblDoanhThu.getSortOrder().clear();
             capNhatThongSo();
             capNhatBieuDo();
-            lblTrangThai.setText("Đã tải dữ liệu từ MySQL cho tháng " + thang);
+            lblTrangThai.setText("Đã tải dữ liệu từ SQLite cho tháng " + thang);
+            // Truy vấn độc lập: lỗi ở bảng Top không làm mất dữ liệu 2 tab cũ.
+            capNhatTopSinhVien();
         } catch (SQLException ex) {
-            lblTrangThai.setText("Không thể cập nhật dữ liệu. Vui lòng kiểm tra kết nối MySQL.");
-            thongBao(Alert.AlertType.ERROR, "Không thể truy vấn MySQL", ex.getMessage());
+            lblTrangThai.setText("Không thể cập nhật dữ liệu. Vui lòng kiểm tra kết nối SQLite và file CSDL.");
+            thongBao(Alert.AlertType.ERROR, "Không thể truy vấn SQLite", ex.getMessage());
         }
     }
 
@@ -251,6 +271,70 @@ public class ThongKeController {
         chartDoanhThu.setPrefHeight(chieuCao);
         scrollBieuDo.setVvalue(0);
 
+    }
+
+    /** Cấu hình bảng xếp hạng riêng; cột không tự sắp xếp để giữ đúng thứ hạng SQL. */
+    private void thietLapBangTopSinhVien() {
+        colTopThuHang.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue().thuHang()));
+        colTopMaSv.setCellValueFactory(c -> new ReadOnlyStringWrapper(c.getValue().maSv()));
+        colTopHoTen.setCellValueFactory(c -> new ReadOnlyStringWrapper(c.getValue().hoTen()));
+        colTopSoLuot.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue().soLuot()));
+        colTopTongTien.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue().tongTien()));
+
+        colTopThuHang.setCellFactory(c -> new TableCell<>() {
+            { getStyleClass().add("tk-rank-cell"); }
+            @Override protected void updateItem(Integer thuHang, boolean empty) {
+                super.updateItem(thuHang, empty);
+                setText(empty || thuHang == null ? null : String.format("%02d", thuHang));
+            }
+        });
+        colTopSoLuot.setCellFactory(c -> new TableCell<>() {
+            { getStyleClass().add("number-cell"); }
+            @Override protected void updateItem(Integer soLuot, boolean empty) {
+                super.updateItem(soLuot, empty);
+                setText(empty || soLuot == null ? null : soLuot + " lượt");
+            }
+        });
+        colTopTongTien.setCellFactory(c -> new TableCell<>() {
+            { getStyleClass().add("money-cell"); }
+            @Override protected void updateItem(BigDecimal soTien, boolean empty) {
+                super.updateItem(soTien, empty);
+                setText(empty || soTien == null ? null : formatTien(soTien));
+            }
+        });
+        tblTopSinhVien.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        for (TableColumn<TopSinhVienDichVuRow, ?> col : tblTopSinhVien.getColumns()) {
+            col.setSortable(false);
+            col.setReorderable(false);
+        }
+        tblTopSinhVien.setPlaceholder(new Label("Tháng này chưa có sinh viên sử dụng dịch vụ."));
+    }
+
+    /** Chỉ đọc thêm thống kê Top; không can thiệp vào bảng và biểu đồ doanh thu. */
+    private void capNhatTopSinhVien() {
+        if (thangDangXem == null) return;
+        int gioiHan = "Top 10".equals(cboTopGioiHan.getValue()) ? 10 : 5;
+        boolean theoTien = !"Số lượt sử dụng".equals(cboTopTieuChi.getValue());
+        lblTopKy.setText("Tháng " + thangDangXem);
+        lblTopMoTa.setText("Xếp hạng theo " + (theoTien ? "tổng tiền dịch vụ" : "số lượt sử dụng")
+                + " · " + cboTopGioiHan.getValue() + " · Tháng " + thangDangXem);
+        try {
+            List<TopSinhVienDichVuRow> rows = dao.findTopSinhVienTheoThang(thangDangXem, gioiHan, theoTien);
+            tblTopSinhVien.setItems(FXCollections.observableArrayList(rows));
+            BigDecimal tongTienTop = rows.stream().map(TopSinhVienDichVuRow::tongTien)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            lblTopSoDong.setText("Hiển thị: " + rows.size() + " sinh viên · " + cboTopGioiHan.getValue());
+            lblTopTongTien.setText(formatTien(tongTienTop));
+            lblTopTrangThai.setText(rows.isEmpty()
+                    ? "Không có giao dịch dịch vụ trong tháng được chọn."
+                    : "Mỗi lượt tương ứng một lần ghi nhận sử dụng dịch vụ; chi phí lấy từ giao dịch đã lưu.");
+        } catch (SQLException ex) {
+            // Lỗi riêng của truy vấn mới không làm thay đổi dữ liệu bảng/biểu đồ cũ.
+            tblTopSinhVien.getItems().clear();
+            lblTopSoDong.setText("Không tải được bảng xếp hạng");
+            lblTopTongTien.setText("—");
+            lblTopTrangThai.setText("Không thể đọc thống kê Top sinh viên: " + ex.getMessage());
+        }
     }
 
     private static void toMauNode(Node node, String color, String tooltip) {

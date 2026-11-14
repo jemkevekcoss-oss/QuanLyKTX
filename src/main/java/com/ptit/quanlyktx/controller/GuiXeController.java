@@ -89,7 +89,7 @@ public class GuiXeController {
     }
 
     @FXML private void initialize() {
-        // 1. Vé tháng: cột JOIN từ MySQL, không phải dữ liệu mẫu.
+        // 1. Vé tháng: dữ liệu JOIN từ SQLite, không phải dữ liệu mẫu.
         colTicketId.setCellValueFactory(c -> str(c.getValue().maVeXe()));
         colTicketPlate.setCellValueFactory(c -> str(c.getValue().bienSoXe()));
         colTicketType.setCellValueFactory(c -> str(c.getValue().loaiXe()));
@@ -143,19 +143,34 @@ public class GuiXeController {
         btnCheckIn.setDisable(true);
         btnCheckOut.setDisable(true);
 
-        // 3. Lịch sử, chỉ đọc dữ liệu lưu từ MySQL.
+        // 3. Lịch sử: dữ liệu từ SQLite, lọc tại giao diện.
         colHistoryId.setCellValueFactory(c -> str(String.valueOf(c.getValue().idLuot())));
         colHistoryPlate.setCellValueFactory(c -> str(c.getValue().bienSoXe()));
         colHistoryStudent.setCellValueFactory(c -> str(c.getValue().hoTen() + " (" + c.getValue().maSV() + ")"));
         colHistoryIn.setCellValueFactory(c -> str(date(c.getValue().thoiGianGui())));
         colHistoryOut.setCellValueFactory(c -> str(date(c.getValue().thoiGianLay())));
         colHistoryFee.setCellValueFactory(c -> str(money(c.getValue().tienPhatSinh())));
+        // Làm nổi bật các lượt phát sinh phí; không thay đổi số tiền lưu trong SQLite.
+        colHistoryFee.setCellFactory(column -> new TableCell<>() {
+            @Override protected void updateItem(String value, boolean empty) {
+                super.updateItem(value, empty);
+                setText(empty ? null : value);
+                getStyleClass().remove("parking-fee-positive");
+                if (!empty && getTableRow() != null && getTableRow().getItem() != null) {
+                    BigDecimal fee = getTableRow().getItem().tienPhatSinh();
+                    if (fee != null && fee.compareTo(BigDecimal.ZERO) > 0) {
+                        getStyleClass().add("parking-fee-positive");
+                    }
+                }
+            }
+        });
         colHistoryState.setCellValueFactory(c -> str(c.getValue().dangGui() ? "● Đang gửi" : "✓ Đã lấy"));
         tableHistory.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
         filteredTrips = new FilteredList<>(trips, t -> true);
         tableHistory.setItems(filteredTrips);
         txtHistorySearch.textProperty().addListener((obs, old, now) -> applyHistoryFilter());
-        cbHistoryStatus.setItems(FXCollections.observableArrayList("Tất cả", "Đang gửi", "Đã lấy"));
+        cbHistoryStatus.setItems(FXCollections.observableArrayList(
+                "Tất cả", "Đang gửi", "Đã lấy", "Có phí phát sinh"));
         cbHistoryStatus.setValue("Tất cả");
         cbHistoryStatus.valueProperty().addListener((obs, old, now) -> applyHistoryFilter());
         dpFrom.setValue(LocalDate.now().minusMonths(1).withDayOfMonth(1));
@@ -288,10 +303,13 @@ public class GuiXeController {
         error.getStyleClass().add("parking-form-error");
         error.setWrapText(true);
 
-        VBox content = new VBox(14, title, subtitle, card, monthField, note, error);
+        HBox header = ticketFormHeader("↻", title, subtitle);
+        VBox content = new VBox(14, header, card, monthField, note, error);
         content.getStyleClass().add("parking-form-content");
+        content.setMinWidth(0);
+        content.setPrefWidth(490);
         pane.setContent(content);
-        pane.setPrefWidth(530);
+        pane.setPrefWidth(580);
         pane.lookupButton(approve).getStyleClass().add("parking-form-success-button");
         pane.lookupButton(cancel).getStyleClass().add("parking-form-cancel-button");
 
@@ -366,11 +384,30 @@ public class GuiXeController {
         pane.getStyleClass().add("parking-form-dialog");
     }
 
+    // Phần đầu dialog đồng bộ: biểu tượng, tiêu đề và mô tả.
+    private HBox ticketFormHeader(String symbol, Label title, Label subtitle) {
+        Label icon = new Label(symbol);
+        icon.getStyleClass().add("parking-form-symbol");
+        icon.setMinSize(48, 48);
+        icon.setPrefSize(48, 48);
+        icon.setAlignment(javafx.geometry.Pos.CENTER);
+        title.setWrapText(true);
+        subtitle.setWrapText(true);
+        VBox captions = new VBox(4, title, subtitle);
+        captions.setMinWidth(0);
+        HBox.setHgrow(captions, javafx.scene.layout.Priority.ALWAYS);
+        HBox header = new HBox(13, icon, captions);
+        header.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        return header;
+    }
+
     private VBox ticketFormField(String caption, Control field) {
         Label label = new Label(caption);
         label.getStyleClass().add("parking-form-label");
+        field.setMinWidth(0);
         field.setMaxWidth(Double.MAX_VALUE);
         VBox result = new VBox(7, label, field);
+        result.setMinWidth(0);
         result.setMaxWidth(Double.MAX_VALUE);
         return result;
     }
@@ -413,15 +450,18 @@ public class GuiXeController {
         type.setPromptText("Ví dụ: Xe máy Honda Wave");
         plate.getStyleClass().add("parking-form-input");
         type.getStyleClass().add("parking-form-input");
+        plate.setMinWidth(0);
+        type.setMinWidth(0);
 
         ComboBox<SinhVienRef> owner = new ComboBox<>();
         owner.getStyleClass().add("parking-form-select");
         owner.setPromptText("Chọn sinh viên đăng ký...");
+        owner.setMinWidth(0);
         owner.setMaxWidth(Double.MAX_VALUE);
         try {
             owner.setItems(FXCollections.observableArrayList(ticketDAO.findStudents()));
             if (editing) owner.getItems().stream()
-                    // MySQL có thể không phân biệt hoa-thường ở ma_sv.
+                    // Dùng so sánh không phân biệt chữ hoa/chữ thường cho mã sinh viên.
                     .filter(s -> s.maSV().equalsIgnoreCase(old.maSV()))
                     .findFirst().ifPresent(owner::setValue);
         } catch (SQLException ex) {
@@ -430,12 +470,17 @@ public class GuiXeController {
         }
 
         GridPane grid = new GridPane();
+        grid.setMinWidth(0);
         grid.setHgap(14);
         grid.setVgap(14);
         javafx.scene.layout.ColumnConstraints c1 = new javafx.scene.layout.ColumnConstraints();
         javafx.scene.layout.ColumnConstraints c2 = new javafx.scene.layout.ColumnConstraints();
         c1.setPercentWidth(50);
         c2.setPercentWidth(50);
+        c1.setMinWidth(0);
+        c2.setMinWidth(0);
+        c1.setFillWidth(true);
+        c2.setFillWidth(true);
         c1.setHgrow(javafx.scene.layout.Priority.ALWAYS);
         c2.setHgrow(javafx.scene.layout.Priority.ALWAYS);
         grid.getColumnConstraints().addAll(c1, c2);
@@ -450,10 +495,13 @@ public class GuiXeController {
         errorLabel.getStyleClass().add("parking-form-error");
         errorLabel.setWrapText(true);
 
-        VBox content = new VBox(14, title, subtitle, card, grid, hint, errorLabel);
+        HBox header = ticketFormHeader(editing ? "✎" : "+", title, subtitle);
+        VBox content = new VBox(14, header, card, grid, hint, errorLabel);
         content.getStyleClass().add("parking-form-content");
+        content.setMinWidth(0);
+        content.setPrefWidth(618);
         pane.setContent(content);
-        pane.setPrefWidth(610);
+        pane.setPrefWidth(710);
         pane.lookupButton(save).getStyleClass().add("parking-form-save-button");
         pane.lookupButton(cancel).getStyleClass().add("parking-form-cancel-button");
         pane.lookupButton(save).addEventFilter(javafx.event.ActionEvent.ACTION, e -> {
@@ -563,9 +611,11 @@ public class GuiXeController {
 
         VBox content = new VBox(16, top, plateCard, details, validityBox);
         content.getStyleClass().add("parking-detail-content");
+        content.setMinWidth(0);
+        content.setPrefWidth(600);
         pane.setContent(content);
-        pane.setPrefWidth(595);
-        pane.setMinWidth(520);
+        pane.setPrefWidth(675);
+        pane.setMinWidth(590);
         pane.lookupButton(edit).getStyleClass().add("parking-detail-edit-button");
         pane.lookupButton(renew).getStyleClass().add("parking-detail-renew-button");
         pane.lookupButton(close).getStyleClass().add("parking-detail-close-button");
@@ -648,7 +698,7 @@ public class GuiXeController {
     @FXML private void handleCheckIn() {
         if (lookedUpTicket == null) { warn("Hãy tra cứu xe có vé tháng trước."); return; }
         try {
-            // Đọc lại từ MySQL để tránh dùng dữ liệu tra cứu đã cũ khi ngày đổi.
+            // Đọc lại từ SQLite để tránh dùng dữ liệu tra cứu đã cũ khi ngày đổi.
             VeXeThangRow latest = ticketDAO.findByPlate(
                     lookedUpTicket.bienSoXe(), YearMonth.now());
             if (latest == null || !latest.maVeXe().equals(lookedUpTicket.maVeXe())
@@ -717,7 +767,9 @@ public class GuiXeController {
                     .toLowerCase(Locale.ROOT).contains(term);
             boolean validState = state == null || state.equals("Tất cả")
                     || (state.equals("Đang gửi") && t.dangGui())
-                    || (state.equals("Đã lấy") && !t.dangGui());
+                    || (state.equals("Đã lấy") && !t.dangGui())
+                    || (state.equals("Có phí phát sinh") && t.tienPhatSinh() != null
+                            && t.tienPhatSinh().compareTo(BigDecimal.ZERO) > 0);
             return matching && validState;
         });
         BigDecimal sum = BigDecimal.ZERO;
@@ -737,19 +789,102 @@ public class GuiXeController {
         loadHistory();
     }
 
-    // -------- DIALOG CHUNG --------
-    private void warn(String m) { new Alert(Alert.AlertType.WARNING, m, ButtonType.OK).showAndWait(); }
-    private void info(String title, String m) {
-        Alert a = new Alert(Alert.AlertType.INFORMATION, m, ButtonType.OK);
-        a.setTitle(title); a.setHeaderText(title); a.showAndWait();
+    // -------- THÔNG BÁO CHUNG (CHỈ THAY ĐỔI GIAO DIỆN) --------
+    private enum NoticeKind { SUCCESS, WARNING, ERROR, CONFIRM }
+
+    private boolean showNotice(NoticeKind kind, String heading, String message) {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle(heading);
+        dialog.setHeaderText(null);
+        dialog.setResizable(false);
+        if (tabPane != null && tabPane.getScene() != null) {
+            dialog.initOwner(tabPane.getScene().getWindow());
+        }
+
+        boolean isConfirm = kind == NoticeKind.CONFIRM;
+        boolean isDelete = isConfirm && heading.toLowerCase(Locale.ROOT).startsWith("xóa");
+        String action = isDelete ? "Xóa vé" :
+                (heading.startsWith("Ghi nhận gửi") ? "Ghi nhận gửi" :
+                 (heading.startsWith("Xác nhận lấy") ? "Xác nhận lấy" : "Xác nhận"));
+        ButtonType accept = new ButtonType(isConfirm ? action : "Đã hiểu", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancel = new ButtonType("Hủy", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        DialogPane pane = dialog.getDialogPane();
+        pane.getButtonTypes().add(accept);
+        if (isConfirm) pane.getButtonTypes().add(cancel);
+        pane.getStylesheets().add(Objects.requireNonNull(
+                getClass().getResource("/com/ptit/quanlyktx/css/guixe.css")
+        ).toExternalForm());
+        pane.getStyleClass().add("parking-notice-dialog");
+
+        String iconText = switch (kind) {
+            case SUCCESS -> "✓";
+            case WARNING -> "!";
+            case ERROR -> "×";
+            case CONFIRM -> "?";
+        };
+        String kindClass = switch (kind) {
+            case SUCCESS -> "parking-notice-success";
+            case WARNING -> "parking-notice-warning";
+            case ERROR -> "parking-notice-error";
+            case CONFIRM -> "parking-notice-confirm";
+        };
+        Label icon = new Label(iconText);
+        icon.getStyleClass().addAll("parking-notice-icon", kindClass);
+        icon.setMinSize(48, 48);
+        icon.setPrefSize(48, 48);
+        icon.setAlignment(javafx.geometry.Pos.CENTER);
+
+        Label title = new Label(heading);
+        title.getStyleClass().add("parking-notice-heading");
+        title.setWrapText(true);
+        title.setMinWidth(0);
+        title.setMaxWidth(Double.MAX_VALUE);
+        Label subtitle = new Label(switch (kind) {
+            case SUCCESS -> "Thao tác đã hoàn tất";
+            case WARNING -> "Vui lòng kiểm tra trước khi tiếp tục";
+            case ERROR -> "Không thể hoàn thành thao tác";
+            case CONFIRM -> "Kiểm tra thông tin trước khi xác nhận";
+        });
+        subtitle.getStyleClass().add("parking-notice-subtitle");
+        subtitle.setWrapText(true);
+        VBox headingBox = new VBox(4, title, subtitle);
+        headingBox.setMinWidth(0);
+        HBox.setHgrow(headingBox, javafx.scene.layout.Priority.ALWAYS);
+        HBox top = new HBox(14, icon, headingBox);
+        top.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+
+        Label body = new Label(message == null || message.isBlank() ? "Vui lòng thử lại." : message);
+        body.getStyleClass().add("parking-notice-message");
+        body.setWrapText(true);
+        body.setMinWidth(0);
+        body.setPrefWidth(390);
+        body.setMaxWidth(Double.MAX_VALUE);
+
+        VBox content = new VBox(16, top, new Separator(), body);
+        content.getStyleClass().add("parking-notice-content");
+        content.setMinWidth(0);
+        content.setPrefWidth(418);
+        pane.setContent(content);
+        pane.setPrefWidth(495);
+        pane.lookupButton(accept).getStyleClass().add(isDelete
+                ? "parking-notice-danger-button" : "parking-notice-confirm-button");
+        if (isConfirm) pane.lookupButton(cancel).getStyleClass().add("parking-notice-cancel-button");
+        dialog.setResultConverter(button -> button);
+        return dialog.showAndWait().orElse(null) == accept;
+    }
+
+    private void warn(String message) {
+        showNotice(NoticeKind.WARNING, "Cần kiểm tra thông tin", message);
+    }
+    private void info(String title, String message) {
+        showNotice(NoticeKind.SUCCESS, title, message);
     }
     private void error(String title, Exception ex) {
-        Alert a = new Alert(Alert.AlertType.ERROR, ex.getMessage(), ButtonType.OK);
-        a.setTitle(title); a.setHeaderText(title); a.showAndWait();
+        String message = ex == null ? null : ex.getMessage();
+        showNotice(NoticeKind.ERROR, title, message);
     }
-    private boolean confirm(String title, String m) {
-        Alert a = new Alert(Alert.AlertType.CONFIRMATION, m, ButtonType.YES, ButtonType.NO);
-        a.setTitle("Xác nhận"); a.setHeaderText(title);
-        return a.showAndWait().orElse(ButtonType.NO) == ButtonType.YES;
+    private boolean confirm(String title, String message) {
+        return showNotice(NoticeKind.CONFIRM, title, message);
     }
 }

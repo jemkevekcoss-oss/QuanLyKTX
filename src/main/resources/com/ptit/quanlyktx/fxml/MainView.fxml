@@ -2,26 +2,53 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.SVGPath?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.ptit.quanlyktx.controller.MainController"
             prefWidth="1150" prefHeight="720" styleClass="app-root">
     <left>
-        <VBox prefWidth="225" spacing="9" styleClass="sidebar">
-            <padding><Insets top="25" right="14" bottom="18" left="14"/></padding>
-            <Label text="PTIT KTX" styleClass="brand"/>
-            <Label text="QUẢN LÝ KÍ TÚC XÁ" styleClass="brand-sub"/>
+        <VBox prefWidth="250" minWidth="250" spacing="11" styleClass="sidebar">
+            <padding><Insets top="25" right="15" bottom="20" left="15"/></padding>
+            <HBox alignment="CENTER_LEFT" spacing="11" styleClass="brand-header">
+                <StackPane styleClass="brand-logo-box" minWidth="62" minHeight="62" prefWidth="62" prefHeight="62" maxWidth="62" maxHeight="62">
+                    <ImageView fitWidth="56" fitHeight="56" preserveRatio="true" smooth="true">
+                        <image><Image url="@../images/ptit_logo.png"/></image>
+                    </ImageView>
+                </StackPane>
+                <VBox alignment="CENTER_LEFT" spacing="5">
+                    <Label text="PTIT KTX" styleClass="brand"/>
+                    <Label text="QUẢN LÝ KÝ TÚC XÁ" styleClass="brand-sub"/>
+                </VBox>
+            </HBox>
             <Separator/>
-            <Button text="⌂  Tổng quan" onAction="#showDashboard" maxWidth="Infinity" styleClass="nav-button"/>
-            <Button text="◉  Sinh viên" onAction="#showStudents" maxWidth="Infinity" styleClass="nav-button"/>
-            <Button text="▣  Phòng ở" onAction="#showRooms" maxWidth="Infinity" styleClass="nav-button"/>
-            <Button text="♧  Khách thăm" onAction="#showVisitors" maxWidth="Infinity" styleClass="nav-button"/>
-            <Button text="✦  Dịch vụ" onAction="#showServices" maxWidth="Infinity" styleClass="nav-button"/>
-            <Button text="▤  Gửi xe" onAction="#showParking" maxWidth="Infinity" styleClass="nav-button"/>
-            <Button text="▧  Hóa đơn" onAction="#showBills" maxWidth="Infinity" styleClass="nav-button"/>
-            <Button text="▥  Thống kê" onAction="#showReports" maxWidth="Infinity" styleClass="nav-button"/>
+            <Button fx:id="navDashboard" text="Tổng quan" onAction="#showDashboard" maxWidth="Infinity" contentDisplay="LEFT" graphicTextGap="14" styleClass="nav-button">
+                <graphic><SVGPath content="M3 10 L12 3 L21 10 M5 9 V21 H19 V9 M9 21 V14 H15 V21" fill="TRANSPARENT" stroke="#C8D7EC" strokeWidth="1.9" strokeLineCap="ROUND" strokeLineJoin="ROUND" styleClass="nav-icon"/></graphic>
+            </Button>
+            <Button fx:id="navStudents" text="Sinh viên" onAction="#showStudents" maxWidth="Infinity" contentDisplay="LEFT" graphicTextGap="14" styleClass="nav-button">
+                <graphic><SVGPath content="M9 12 C11.2 12 13 10.2 13 8 C13 5.8 11.2 4 9 4 C6.8 4 5 5.8 5 8 C5 10.2 6.8 12 9 12 Z M2.5 20 V18.5 C2.5 15.5 5 14 9 14 C13 14 15.5 15.5 15.5 18.5 V20 M16.5 4.5 C18.5 5 19.5 6.5 19.5 8.5 C19.5 10.5 18.5 12 16.5 12.5 M18.5 14.5 C20.7 15 21.5 16.3 21.5 18.5 V20" fill="TRANSPARENT" stroke="#C8D7EC" strokeWidth="1.9" strokeLineCap="ROUND" strokeLineJoin="ROUND" styleClass="nav-icon"/></graphic>
+            </Button>
+            <Button fx:id="navRooms" text="Phòng ở" onAction="#showRooms" maxWidth="Infinity" contentDisplay="LEFT" graphicTextGap="14" styleClass="nav-button">
+                <graphic><SVGPath content="M3 4 V21 M21 21 V12 C21 10.3 19.7 9 18 9 H8 C6.3 9 5 10.3 5 12 V16 H21 M3 16 H21 M5 9 V6 C5 5 5.9 4 7 4 H10 C11.1 4 12 5 12 6 V9" fill="TRANSPARENT" stroke="#C8D7EC" strokeWidth="1.9" strokeLineCap="ROUND" strokeLineJoin="ROUND" styleClass="nav-icon"/></graphic>
+            </Button>
+            <Button fx:id="navVisitors" text="Khách thăm" onAction="#showVisitors" maxWidth="Infinity" contentDisplay="LEFT" graphicTextGap="14" styleClass="nav-button">
+                <graphic><SVGPath content="M8.5 12 C10.7 12 12.5 10.2 12.5 8 S10.7 4 8.5 4 S4.5 5.8 4.5 8 S6.3 12 8.5 12 Z M2 20 V18 C2 15.5 4.5 14 8.5 14 C11 14 12.6 14.6 13.7 15.8 M15.5 18 L18 20.5 L22 15.5" fill="TRANSPARENT" stroke="#C8D7EC" strokeWidth="1.9" strokeLineCap="ROUND" strokeLineJoin="ROUND" styleClass="nav-icon"/></graphic>
+            </Button>
+            <Button fx:id="navServices" text="Dịch vụ" onAction="#showServices" maxWidth="Infinity" contentDisplay="LEFT" graphicTextGap="14" styleClass="nav-button">
+                <graphic><SVGPath content="M4 4 H10 V10 H4 Z M14 4 H20 V10 H14 Z M4 14 H10 V20 H4 Z M14 14 H20 V20 H14 Z" fill="TRANSPARENT" stroke="#C8D7EC" strokeWidth="1.9" strokeLineCap="ROUND" strokeLineJoin="ROUND" styleClass="nav-icon"/></graphic>
+            </Button>
+            <Button fx:id="navParking" text="Gửi xe" onAction="#showParking" maxWidth="Infinity" contentDisplay="LEFT" graphicTextGap="14" styleClass="nav-button">
+                <graphic><SVGPath content="M5 20 A3 3 0 1 0 5 14 A3 3 0 1 0 5 20 M19 20 A3 3 0 1 0 19 14 A3 3 0 1 0 19 20 M5 17 L9 9 L15 17 H11 L9 13 H16 L19 17 M8 9 H11" fill="TRANSPARENT" stroke="#C8D7EC" strokeWidth="1.9" strokeLineCap="ROUND" strokeLineJoin="ROUND" styleClass="nav-icon"/></graphic>
+            </Button>
+            <Button fx:id="navBills" text="Hóa đơn" onAction="#showBills" maxWidth="Infinity" contentDisplay="LEFT" graphicTextGap="14" styleClass="nav-button">
+                <graphic><SVGPath content="M6 3 H18 V21 L15 19 L12 21 L9 19 L6 21 Z M9 8 H15 M9 12 H15 M9 16 H13" fill="TRANSPARENT" stroke="#C8D7EC" strokeWidth="1.9" strokeLineCap="ROUND" strokeLineJoin="ROUND" styleClass="nav-icon"/></graphic>
+            </Button>
+            <Button fx:id="navReports" text="Thống kê Doanh thu" onAction="#showReports" maxWidth="Infinity" contentDisplay="LEFT" graphicTextGap="14" styleClass="nav-button">
+                <graphic><SVGPath content="M3 20 V13 H7 V20 M10 20 V9 H14 V20 M17 20 V4 H21 V20 M2 20 H22" fill="TRANSPARENT" stroke="#C8D7EC" strokeWidth="1.9" strokeLineCap="ROUND" strokeLineJoin="ROUND" styleClass="nav-icon"/></graphic>
+            </Button>
             <Region VBox.vgrow="ALWAYS"/>
-
         </VBox>
     </left>
     <center>

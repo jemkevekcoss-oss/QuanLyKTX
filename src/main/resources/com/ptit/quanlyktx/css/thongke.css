@@ -59,3 +59,19 @@
 .axis-label { -fx-text-fill: #6e89a6; -fx-font-size: 11px; }
 .default-color0.chart-bar { -fx-bar-fill: #2563eb; }
 .chart-bar:hover { -fx-opacity: 0.85; }
+
+/* Tab Top SV: phạm vi style riêng, không tác động hai tab cũ. */
+.tk-ranking-filter {
+    -fx-padding: 12 14 12 14;
+    -fx-background-color: #f5f8fe;
+    -fx-border-color: #e0e9f8;
+    -fx-background-radius: 9;
+    -fx-border-radius: 9;
+}
+.tk-ranking-filter .tk-combo { -fx-pref-height: 36px; }
+.tk-ranking-table .table-cell.tk-rank-cell {
+    -fx-text-fill: #175bcc;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER;
+}
+.tk-ranking-table .table-cell.money-cell { -fx-text-fill: #0759c5; }

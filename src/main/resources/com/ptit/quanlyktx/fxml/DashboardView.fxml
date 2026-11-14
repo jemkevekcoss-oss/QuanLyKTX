@@ -100,5 +100,4 @@
             </Button>
         </HBox>
     </VBox>
-    <Label fx:id="lblCapNhat" text="Đang tải dữ liệu…" styleClass="dash-footer"/>
 </VBox>

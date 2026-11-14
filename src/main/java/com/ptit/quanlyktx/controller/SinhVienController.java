@@ -6,6 +6,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.ColumnConstraints;
@@ -24,7 +27,7 @@ import java.util.stream.Collectors;
 import com.ptit.quanlyktx.dao.SinhVienDAO;
 import java.sql.SQLException;
 
-/** Quản lý sinh viên nội trú: CRUD và thống kê dữ liệu thực từ MySQL. */
+/** Quản lý sinh viên nội trú: CRUD và thống kê dữ liệu thực từ cơ sở dữ liệu. */
 public class SinhVienController {
     
     private final SinhVienDAO sinhVienDAO = new SinhVienDAO();
@@ -72,16 +75,16 @@ public class SinhVienController {
                 change -> updateCount()
         );
 
-        // Lấy dữ liệu thật từ MySQL
+        // Lấy dữ liệu thật từ cơ sở dữ liệu
         loadFromDatabase();
     }
     
     private boolean loadFromDatabase() {
     try {
-        // Đọc dữ liệu mới nhất từ MySQL
+        // Đọc dữ liệu mới nhất từ cơ sở dữ liệu
         danhSach.setAll(sinhVienDAO.findAll());
 
-        // Đồng bộ bảng và thẻ thống kê với dữ liệu MySQL mới nhất.
+        // Đồng bộ bảng và thẻ thống kê với dữ liệu cơ sở dữ liệu mới nhất.
         updateCount();
         updateStatistics();
 
@@ -106,7 +109,7 @@ public class SinhVienController {
         return date == null ? "" : date.format(DISPLAY_DATE);
     }
 
-    // Thống kê từ toàn bộ danh sách đọc từ MySQL, không phụ thuộc từ khóa tìm kiếm.
+    // Thống kê từ toàn bộ danh sách đọc từ cơ sở dữ liệu, không phụ thuộc từ khóa tìm kiếm.
     private void updateStatistics() {
         lblTotalStudents.setText(String.valueOf(danhSach.size()));
 
@@ -149,11 +152,11 @@ public class SinhVienController {
     private void handleAdd() {
         showForm(null).ifPresent(sv -> {
             try {
-                // Thêm sinh viên vào MySQL
+                // Thêm sinh viên vào cơ sở dữ liệu
                 boolean success = sinhVienDAO.insert(sv);
 
                 if (success) {
-                    // Tải lại danh sách từ MySQL
+                    // Tải lại danh sách từ cơ sở dữ liệu
                     if (loadFromDatabase()) {
                         // Chọn sinh viên vừa thêm
                         selectStudent(sv.getMaSV());
@@ -181,11 +184,11 @@ public class SinhVienController {
 
         showForm(current).ifPresent(updated -> {
             try {
-                // Cập nhật thông tin sinh viên trong MySQL
+                // Cập nhật thông tin sinh viên trong cơ sở dữ liệu
                 boolean success = sinhVienDAO.update(updated);
 
                 if (success) {
-                    // Tải lại danh sách từ MySQL
+                    // Tải lại danh sách từ cơ sở dữ liệu
                     if (loadFromDatabase()) {
                         // Chọn lại sinh viên vừa sửa
                         selectStudent(updated.getMaSV());
@@ -193,7 +196,7 @@ public class SinhVienController {
 
                     info("Cập nhật thông tin sinh viên thành công!");
                 } else {
-                    warn("Không tìm thấy sinh viên cần cập nhật trong MySQL.");
+                    warn("Không tìm thấy hồ sơ sinh viên cần cập nhật trong cơ sở dữ liệu.");
                 }
 
             } catch (SQLException e) {
@@ -211,24 +214,13 @@ public class SinhVienController {
             return;
         }
 
-        // Yêu cầu xác nhận trước khi xóa
-        Alert confirm = new Alert(
-                Alert.AlertType.CONFIRMATION,
-                "Bạn có chắc chắn muốn xóa sinh viên "
-                        + current.getHoTen()
-                        + " (" + current.getMaSV() + ") khỏi cơ sở dữ liệu?",
-                ButtonType.YES,
-                ButtonType.NO
-        );
-
-        confirm.setTitle("Xác nhận xóa");
-
-        if (confirm.showAndWait().orElse(ButtonType.NO) != ButtonType.YES) {
+        // Chỉ xác nhận xóa bằng dialog tiếng Việt theo phong cách ứng dụng.
+        if (!confirmDelete(current)) {
             return;
         }
 
         try {
-            // Xóa sinh viên trong MySQL theo mã sinh viên
+            // Xóa sinh viên trong cơ sở dữ liệu theo mã sinh viên
             boolean success = sinhVienDAO.delete(current.getMaSV());
 
             if (success) {
@@ -237,7 +229,7 @@ public class SinhVienController {
 
                 info("Xóa sinh viên thành công!");
             } else {
-                warn("Không tìm thấy sinh viên cần xóa trong MySQL.");
+                warn("Không tìm thấy hồ sơ sinh viên cần xóa trong cơ sở dữ liệu.");
             }
 
         } catch (SQLException e) {
@@ -265,12 +257,8 @@ public class SinhVienController {
         DialogPane pane = dialog.getDialogPane();
         pane.getButtonTypes().addAll(saveType, cancelType);
         pane.getStyleClass().add("sv-dialog-pane");
-        // Dialog là một cửa sổ riêng, phải nạp CSS riêng cho nó.
-        java.net.URL css = getClass().getResource(
-                "/com/ptit/quanlyktx/css/sinhvien.css");
-        if (css != null) {
-            pane.getStylesheets().add(css.toExternalForm());
-        }
+        // Dialog có cửa sổ riêng nên cần nạp stylesheet tại đây.
+        loadDialogCss(pane);
 
         TextField ma = new TextField(editing ? safe(current.getMaSV()) : "");
         TextField cmt = new TextField(editing ? safe(current.getSoCmt()) : "");
@@ -287,11 +275,17 @@ public class SinhVienController {
         que.setPromptText("Tỉnh / thành phố");
         phong.setPromptText("Ví dụ P101");
         // Giữ khóa chính khi sửa để tránh ảnh hưởng FK các bảng liên quan.
-        ma.setDisable(editing);
+        ma.setEditable(!editing);
+        if (editing) {
+            ma.getStyleClass().add("sv-field-readonly");
+        }
 
         GridPane grid = new GridPane();
-        grid.setHgap(14);
-        grid.setVgap(13);
+        grid.setPadding(
+            new javafx.geometry.Insets(0, 20, 0, 20)
+        );
+        grid.setHgap(20);
+        grid.setVgap(17);
         ColumnConstraints left = new ColumnConstraints();
         ColumnConstraints right = new ColumnConstraints();
         left.setPercentWidth(50);
@@ -308,25 +302,45 @@ public class SinhVienController {
         grid.add(formField("Phòng ở", phong), 0, 3);
         grid.add(formField("Ngày vào ở", vao), 1, 3);
 
+        // Header có điểm nhấn; hai cột thông tin và banner rõ ràng, thoáng hơn.
+        Label mark = new Label(editing ? "✎" : "+");
+        mark.getStyleClass().add("sv-form-mark");
         Label title = new Label(editing ? "Cập nhật hồ sơ sinh viên" : "Thêm sinh viên nội trú");
         title.getStyleClass().add("sv-dialog-title");
-        Label subtitle = new Label("Thông tin được lưu trực tiếp vào bảng SINH_VIEN trong MySQL.");
+        Label subtitle = new Label("Thông tin sinh viên được lưu trong cơ sở dữ liệu của hệ thống.");
+        subtitle.setWrapText(true);
         subtitle.getStyleClass().add("sv-dialog-description");
+        VBox titleBox = new VBox(5, title, subtitle);
+        HBox formHeader = new HBox(15, mark, titleBox);
+        formHeader.setAlignment(Pos.CENTER_LEFT);
+        formHeader.getStyleClass().add("sv-dialog-header");
+
+        Label hintIcon = new Label("i");
+        hintIcon.getStyleClass().add("sv-hint-icon");
         Label tip = new Label(editing
-                ? "Mã sinh viên không thể thay đổi khi chỉnh sửa hồ sơ."
-                : "Điền đủ 8 trường thông tin. Kiểm tra số phòng trước khi lưu.");
+                ? "Mã sinh viên được giữ nguyên để bảo đảm liên kết dữ liệu."
+                : "Điền đầy đủ 8 trường thông tin và kiểm tra phòng trước khi lưu.");
+        tip.setWrapText(true);
         tip.getStyleClass().add("sv-dialog-banner-label");
-        VBox banner = new VBox(tip);
+        HBox banner = new HBox(10, hintIcon, tip);
+        banner.setAlignment(Pos.CENTER_LEFT);
         banner.getStyleClass().add("sv-dialog-banner");
+        HBox.setHgrow(tip, Priority.ALWAYS);
+
+        Label section = new Label("THÔNG TIN HỒ SƠ");
+        section.getStyleClass().add("sv-dialog-section-label");
 
         Label error = new Label();
         error.setWrapText(true);
         error.getStyleClass().add("sv-validation-error");
+        error.setVisible(false);
+        error.managedProperty().bind(error.visibleProperty());
 
-        VBox content = new VBox(14, title, subtitle, banner, grid, error);
+        VBox content = new VBox(18, formHeader, banner, section, grid, error);
         content.getStyleClass().add("sv-dialog-content");
         pane.setContent(content);
-        pane.setPrefWidth(690);
+        pane.setPrefWidth(760);
+        attachOwner(dialog);
 
         Button saveButton = (Button) pane.lookupButton(saveType);
         saveButton.getStyleClass().add("sv-dialog-save");
@@ -336,7 +350,10 @@ public class SinhVienController {
             String validation = validate(current, ma, cmt, ten, sinh, lop, que, phong, vao);
             if (validation != null) {
                 error.setText(validation);
+                error.setVisible(true);
                 event.consume();
+            } else {
+                error.setVisible(false);
             }
         });
         dialog.setResultConverter(button -> button == saveType
@@ -350,11 +367,17 @@ public class SinhVienController {
     private VBox formField(String caption, Control input) {
         Label title = new Label(caption);
         title.getStyleClass().add("sv-field-label");
+        Label required = new Label("*");
+        required.getStyleClass().add("sv-field-required");
+        HBox captionRow = new HBox(4, title, required);
+        captionRow.setAlignment(Pos.CENTER_LEFT);
         if (input instanceof TextField) {
             input.getStyleClass().add("sv-field-input");
+        } else if (input instanceof DatePicker) {
+            input.getStyleClass().add("sv-date-input");
         }
         input.setMaxWidth(Double.MAX_VALUE);
-        VBox box = new VBox(6, title, input);
+        VBox box = new VBox(8, captionRow, input);
         box.setMaxWidth(Double.MAX_VALUE);
         return box;
     }
@@ -370,7 +393,7 @@ public class SinhVienController {
         if (id.length() > 20 || cc.length() > 20 || ten.getText().length() > 100
                 || lop.getText().length() > 50 || que.getText().length() > 100
                 || phong.getText().length() > 10)
-            return "Một hoặc nhiều trường vượt quá độ dài VARCHAR quy định ở YC1.";
+            return "Một số thông tin quá dài. Vui lòng rút ngắn nội dung và thử lại.";
         if (sinh.getValue().isAfter(LocalDate.now()) || vao.getValue().isBefore(sinh.getValue()))
             return "Ngày sinh/ngày vào ở không hợp lệ.";
         for (SinhVien sv : danhSach) {
@@ -378,57 +401,133 @@ public class SinhVienController {
             if (sv.getMaSV().equalsIgnoreCase(id)) return "Mã sinh viên đã tồn tại.";
             if (sv.getSoCmt().equalsIgnoreCase(cc)) return "Số CMT/CCCD đã tồn tại.";
         }
-        // Khi kết nối MySQL cần kiểm tra phòng tồn tại và chưa vượt sức chứa tại Service/DB.
+        // Khi kết nối cơ sở dữ liệu cần kiểm tra phòng tồn tại và chưa vượt sức chứa tại Service/DB.
         return null;
     }
 
+    // Mọi thông báo trong module Sinh viên dùng cùng một giao diện.
     private void warn(String message) {
-        Alert alert = new Alert(Alert.AlertType.WARNING, message, ButtonType.OK);
-        alert.setTitle("Quản lý sinh viên");
-        alert.showAndWait();
+        showNotice("warning", "Cần kiểm tra thông tin", message);
     }
-    
-    //Thông báo thành công
+
     private void info(String message) {
-        Alert alert = new Alert(
-                Alert.AlertType.INFORMATION,
-                message,
-                ButtonType.OK
-        );
-
-        alert.setTitle("Quản lý sinh viên");
-        alert.showAndWait();
+        showNotice("success", "Thao tác thành công", message);
     }
-    //Thông báo lỗi MySQL
-    private void showDatabaseError(String action, SQLException e) {
 
+    private void showNotice(String kind, String heading, String message) {
+        ButtonType ok = new ButtonType("Đã hiểu", ButtonBar.ButtonData.OK_DONE);
+        Dialog<ButtonType> dialog = createMessageDialog(kind, heading, message, ok);
+        Button button = (Button) dialog.getDialogPane().lookupButton(ok);
+        button.getStyleClass().add("sv-message-primary");
+        dialog.showAndWait();
+    }
+
+    private boolean confirmDelete(SinhVien sv) {
+        ButtonType delete = new ButtonType("Xóa sinh viên", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancel = new ButtonType("Hủy", ButtonBar.ButtonData.CANCEL_CLOSE);
+        String text = "Bạn có chắc muốn xóa hồ sơ của " + sv.getHoTen()
+                + " (" + sv.getMaSV() + ")?\n"
+                + "Dữ liệu liên quan có thể bị ảnh hưởng. Hành động này không thể hoàn tác.";
+        Dialog<ButtonType> dialog = createMessageDialog(
+                "confirm", "Xác nhận xóa sinh viên", text, delete, cancel);
+        ((Button) dialog.getDialogPane().lookupButton(delete))
+                .getStyleClass().add("sv-message-danger-button");
+        ((Button) dialog.getDialogPane().lookupButton(cancel))
+                .getStyleClass().add("sv-message-secondary");
+        return dialog.showAndWait().filter(delete::equals).isPresent();
+    }
+
+    private Dialog<ButtonType> createMessageDialog(String kind, String heading,
+                                                    String message, ButtonType... buttons) {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("PTIT KTX - Quản lý sinh viên");
+        dialog.setHeaderText(null);
+        dialog.setGraphic(null);
+        dialog.setResizable(false);
+        attachOwner(dialog);
+
+        DialogPane pane = dialog.getDialogPane();
+        pane.getButtonTypes().addAll(buttons);
+        pane.getStyleClass().addAll("sv-message-pane", "sv-message-" + kind);
+        loadDialogCss(pane);
+
+        String symbol = switch (kind) {
+            case "success" -> "✓";
+            case "warning" -> "!";
+            case "error" -> "×";
+            default -> "?";
+        };
+        Label icon = new Label(symbol);
+        icon.getStyleClass().add("sv-message-icon");
+        Label title = new Label(heading);
+        title.getStyleClass().add("sv-message-title");
+        title.setWrapText(true);
+
+        HBox header = new HBox(14, icon, title);
+        header.setAlignment(Pos.CENTER_LEFT);
+
+        Region rule = new Region();
+        rule.getStyleClass().add("sv-message-rule");
+        rule.setMinHeight(1);
+
+        Label body = new Label(message);
+        body.setWrapText(true);
+        body.setMaxWidth(Double.MAX_VALUE);
+        body.getStyleClass().add("sv-message-body");
+
+        VBox layout = new VBox(17, header, rule, body);
+        layout.getStyleClass().add("sv-message-content");
+        pane.setContent(layout);
+        pane.setPrefWidth(465);
+        dialog.setResultConverter(button -> button);
+        return dialog;
+    }
+
+    private void attachOwner(Dialog<?> dialog) {
+        if (tableStudents != null && tableStudents.getScene() != null
+                && tableStudents.getScene().getWindow() != null) {
+            dialog.initOwner(tableStudents.getScene().getWindow());
+        }
+    }
+
+    private void loadDialogCss(DialogPane pane) {
+        java.net.URL css = getClass().getResource(
+                "/com/ptit/quanlyktx/css/sinhvien.css");
+        if (css != null) {
+            pane.getStylesheets().add(css.toExternalForm());
+        }
+    }
+
+    // Giữ nguyên nghiệp vụ CSDL, chỉ chuyển lỗi kỹ thuật thành thông báo dễ hiểu.
+    private void showDatabaseError(String action, SQLException e) {
+        String raw = e.getMessage() == null ? "" : e.getMessage();
+        String reason = raw.toLowerCase(Locale.ROOT);
         String detail;
 
-        switch (e.getErrorCode()) {
-            case 1062 ->
-                detail = "Mã sinh viên hoặc số CMT/CCCD đã tồn tại.";
-
-            case 1452 ->
-                detail = "Dữ liệu tham chiếu không hợp lệ. "
-                       + "Hãy kiểm tra số phòng.";
-
-            case 1451 ->
-                detail = "Không thể xóa hoặc thay đổi dữ liệu "
-                       + "vì đang có bản ghi liên quan.";
-
-            default ->
-                detail = "Lỗi MySQL: " + e.getMessage();
+        if (reason.contains("sức chứa") || reason.contains("suc chua")
+                || reason.contains("phòng đã đủ") || reason.contains("phong da du")
+                || reason.contains("phòng đã đầy") || reason.contains("phong da day")) {
+            detail = "Phòng đã đủ số người ở tối đa. Vui lòng chọn phòng còn chỗ.";
+        } else if (reason.contains("unique constraint") || reason.contains("duplicate entry")
+                || reason.contains("sinh_vien.ma_sv") || reason.contains("sinh_vien.so_cmt")) {
+            detail = "Mã sinh viên hoặc số CMT/CCCD đã tồn tại trong cơ sở dữ liệu.";
+        } else if (reason.contains("foreign key") || reason.contains("khóa ngoại")) {
+            detail = action.toLowerCase(Locale.ROOT).contains("xóa")
+                    ? "Không thể xóa hồ sơ vì đang có dữ liệu liên quan."
+                    : "Phòng ở không tồn tại hoặc dữ liệu liên kết chưa hợp lệ.";
+        } else if (reason.contains("database is locked") || reason.contains("database locked")) {
+            detail = "Cơ sở dữ liệu đang được sử dụng. Vui lòng thử lại sau.";
+        } else if (reason.contains("check constraint")) {
+            detail = "Dữ liệu không đáp ứng một ràng buộc hợp lệ của hệ thống.";
+        } else {
+            detail = "Không thể hoàn thành thao tác với cơ sở dữ liệu. "
+                    + "Vui lòng kiểm tra thông tin hoặc thử lại.";
         }
-
-        Alert alert = new Alert(
-                Alert.AlertType.ERROR,
-                action + ".\n" + detail,
-                ButtonType.OK
-        );
-
-        alert.setTitle("Lỗi cơ sở dữ liệu");
-        alert.showAndWait();
+        // Lưu chi tiết kỹ thuật cho người phát triển kiểm tra, không hiện lên dialog.
+        System.err.println("[SinhVien - Database] " + action + ": " + raw);
+        showNotice("error", action, detail);
     }
+
     //Chọn lại sinh viên sau khi tải dữ liệu
     private void selectStudent(String maSV) {
 

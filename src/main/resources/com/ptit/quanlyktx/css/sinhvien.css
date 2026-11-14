@@ -121,47 +121,181 @@
 }
 .sv-empty-text, .sv-footer-count { -fx-text-fill: #7589A4; -fx-font-size: 12px; }
 
-/* Hộp thoại Thêm / Sửa sinh viên */
+/* ===== Form thêm / sửa: style chỉ áp dụng cho Dialog của Sinh viên ===== */
 .sv-dialog-pane {
-    -fx-background-color: #F8FAFE;
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 13;
     -fx-font-family: "Segoe UI", Arial, sans-serif;
 }
 .sv-dialog-pane > .content { -fx-padding: 0; }
-.sv-dialog-pane > .button-bar > .container { -fx-padding: 13 19 16 19; }
-.sv-dialog-content { -fx-padding: 21 23 12 23; }
-.sv-dialog-title { -fx-text-fill: #152B49; -fx-font-size: 21px; -fx-font-weight: bold; }
-.sv-dialog-description { -fx-text-fill: #7486A0; -fx-font-size: 12px; }
-.sv-dialog-banner {
-    -fx-background-color: #EAF1FF;
-    -fx-background-radius: 10;
-    -fx-padding: 12 15;
+.sv-dialog-pane > .button-bar > .container {
+    -fx-padding: 15 30 23 30;
+    -fx-background-color: #FFFFFF;
 }
-.sv-dialog-banner-label { -fx-text-fill: #315C99; -fx-font-size: 12px; }
-.sv-field-label { -fx-text-fill: #4D6382; -fx-font-size: 12px; -fx-font-weight: bold; }
-.sv-field-input, .sv-dialog-content .date-picker {
-    -fx-background-color: white;
-    -fx-border-color: #CDD9EB;
-    -fx-border-radius: 7;
-    -fx-background-radius: 7;
-    -fx-pref-height: 37;
+.sv-dialog-content {
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 20 28 24 28;
+}
+.sv-dialog-header { -fx-padding: 0 0 9 0; }
+.sv-form-mark {
+    -fx-background-color: #E8F0FF;
+    -fx-background-radius: 13;
+    -fx-min-width: 48; -fx-min-height: 48;
+    -fx-pref-width: 48; -fx-pref-height: 48;
+    -fx-alignment: CENTER;
+    -fx-text-fill: #2563EB;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+.sv-dialog-title {
+    -fx-text-fill: #14263D;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
+.sv-dialog-description {
+    -fx-text-fill: #788CA6;
     -fx-font-size: 12px;
 }
-.sv-field-input:focused { -fx-border-color: #3578E8; }
-.sv-field-input:disabled { -fx-opacity: 0.75; }
-.sv-validation-error { -fx-text-fill: #B43B3B; -fx-font-size: 12px; }
-.sv-dialog-save {
-    -fx-background-color: #2563EB;
+.sv-dialog-banner {
+    -fx-background-color: #EDF4FF;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-padding: 12 14;
+}
+.sv-hint-icon {
+    -fx-background-color: #2A69D6;
+    -fx-background-radius: 50;
+    -fx-min-width: 19; -fx-min-height: 19;
+    -fx-pref-width: 19; -fx-pref-height: 19;
+    -fx-alignment: CENTER;
     -fx-text-fill: white;
+    -fx-font-size: 12px; -fx-font-weight: bold;
+}
+.sv-dialog-banner-label {
+    -fx-text-fill: #315F9C;
+    -fx-font-size: 12px;
+}
+.sv-dialog-section-label {
+    -fx-text-fill: #2F547F;
+    -fx-font-size: 11px;
     -fx-font-weight: bold;
-    -fx-background-radius: 7;
-    -fx-padding: 9 17;
-    -fx-cursor: hand;
+    -fx-padding: 3 0 0 0;
 }
+.sv-field-label {
+    -fx-text-fill: #35516F;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+.sv-field-required { -fx-text-fill: #D14E54; -fx-font-size: 13px; }
+.sv-field-input {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #CCD9E9;
+    -fx-border-width: 1;
+    -fx-border-radius: 9;
+    -fx-background-radius: 9;
+    -fx-font-size: 13px;
+    -fx-text-fill: #1E3755;
+    -fx-prompt-text-fill: #A3B0C2;
+    -fx-padding: 11 14;
+    -fx-pref-height: 44;
+}
+.sv-field-input:focused {
+    -fx-border-color: #2F70E8;
+    -fx-effect: dropshadow(gaussian, rgba(37,99,235,0.10), 6, 0, 0, 1);
+}
+.sv-field-readonly {
+    -fx-background-color: #F2F5FA;
+    -fx-text-fill: #49617F;
+    -fx-border-color: #DFE6F1;
+}
+.sv-dialog-content .date-picker {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #CCD9E9;
+    -fx-border-width: 1;
+    -fx-border-radius: 9;
+    -fx-background-radius: 9;
+    -fx-pref-height: 44;
+}
+.sv-dialog-content .date-picker:focused { -fx-border-color: #2F70E8; }
+.sv-dialog-content .date-picker > .text-field {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 9 0 0 9;
+    -fx-border-color: transparent;
+    -fx-font-size: 13px;
+    -fx-text-fill: #1E3755;
+    -fx-padding: 10 12;
+}
+.sv-dialog-content .date-picker > .arrow-button {
+    -fx-background-color: #F0F5FC;
+    -fx-background-radius: 0 8 8 0;
+    -fx-padding: 0 12;
+}
+.sv-dialog-content .date-picker > .arrow-button:hover {
+    -fx-background-color: #E1ECFC;
+}
+.sv-validation-error {
+    -fx-background-color: #FFF1F2;
+    -fx-background-radius: 8;
+    -fx-padding: 12 14;
+    -fx-text-fill: #B43442;
+    -fx-font-size: 12px;
+}
+.sv-dialog-save, .sv-dialog-cancel {
+    -fx-background-radius: 9;
+    -fx-border-radius: 9;
+    -fx-padding: 11 20;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-min-width: 120;
+}
+.sv-dialog-save { -fx-background-color: #2563EB; -fx-text-fill: white; }
 .sv-dialog-save:hover { -fx-background-color: #1D4ED8; }
-.sv-dialog-cancel {
-    -fx-background-color: #E9EFF8;
-    -fx-text-fill: #4B607F;
-    -fx-background-radius: 7;
-    -fx-padding: 9 17;
+.sv-dialog-cancel { -fx-background-color: #EFF3FA; -fx-text-fill: #526A88; }
+.sv-dialog-cancel:hover { -fx-background-color: #E1E9F5; }
+
+/* ===== Dialog thông báo và xác nhận: không dùng giao diện Alert mặc định ===== */
+.sv-message-pane {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 13;
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+}
+.sv-message-pane > .content { -fx-padding: 0; }
+.sv-message-pane > .button-bar > .container {
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 4 25 23 25;
+}
+.sv-message-content { -fx-padding: 27 27 19 27; }
+.sv-message-title { -fx-text-fill: #152B49; -fx-font-size: 18px; -fx-font-weight: bold; }
+.sv-message-body { -fx-text-fill: #425A77; -fx-font-size: 13px; -fx-line-spacing: 4; }
+.sv-message-rule { -fx-background-color: #E5EBF3; -fx-pref-height: 1; }
+.sv-message-icon {
+    -fx-alignment: CENTER;
+    -fx-background-radius: 12;
+    -fx-pref-height: 48; -fx-pref-width: 48;
+    -fx-min-height: 48; -fx-min-width: 48;
+    -fx-font-size: 25px;
+    -fx-font-weight: bold;
+}
+.sv-message-success .sv-message-icon { -fx-background-color: #E4F6EE; -fx-text-fill: #087B55; }
+.sv-message-warning .sv-message-icon { -fx-background-color: #FFF2DA; -fx-text-fill: #B8790C; }
+.sv-message-error .sv-message-icon   { -fx-background-color: #FDE8EA; -fx-text-fill: #C43945; }
+.sv-message-confirm .sv-message-icon { -fx-background-color: #E8F0FF; -fx-text-fill: #2563EB; }
+.sv-message-primary, .sv-message-secondary, .sv-message-danger-button {
+    -fx-background-radius: 9;
+    -fx-border-radius: 9;
+    -fx-padding: 10 20;
+    -fx-min-width: 106;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
     -fx-cursor: hand;
 }
+.sv-message-primary { -fx-background-color: #2563EB; -fx-text-fill: white; }
+.sv-message-primary:hover { -fx-background-color: #1D4ED8; }
+.sv-message-secondary { -fx-background-color: #EFF3FA; -fx-text-fill: #526A88; }
+.sv-message-secondary:hover { -fx-background-color: #E0E9F6; }
+.sv-message-danger-button { -fx-background-color: #D9404F; -fx-text-fill: white; }
+.sv-message-danger-button:hover { -fx-background-color: #B92939; }
+
+

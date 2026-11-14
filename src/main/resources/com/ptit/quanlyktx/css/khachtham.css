@@ -148,3 +148,145 @@
 .kt-table .placeholder .label { -fx-text-fill: #8398B1; -fx-font-size: 12px; }
 .kt-table .scroll-bar .thumb { -fx-background-color: #B8C8D8; -fx-background-radius: 5; }
 .kt-table .scroll-bar .track { -fx-background-color: #F3F6FA; }
+
+/* ======================= DIALOG RIENG CHO KHACH THAM ======================
+   Quan trong: Controller tai truc tiep stylesheet nay cho DialogPane.
+   CSS cua kt-page KHONG tu ke thua vao cua so Dialog.
+   Khong anh huong den ba tab hien co.
+   ======================================================================== */
+.kt-dialog-pane {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 12;
+    -fx-border-color: #DCE6F2;
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+}
+.kt-dialog-pane > .content {
+    -fx-padding: 0;
+}
+.kt-dialog-pane > .button-bar > .container {
+    -fx-padding: 14 30 22 30;
+    -fx-background-color: #FFFFFF;
+}
+.kt-dialog-content {
+    -fx-padding: 24 30 10 30;
+    -fx-background-color: #FFFFFF;
+    -fx-spacing: 18;
+}
+.kt-dialog-pane .kt-dialog-symbol {
+    -fx-min-width: 50;
+    -fx-min-height: 50;
+    -fx-pref-width: 50;
+    -fx-pref-height: 50;
+    -fx-alignment: CENTER;
+    -fx-font-size: 25px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 13;
+}
+.kt-dialog-pane .kt-dialog-symbol-info {
+    -fx-text-fill: #2563EB;
+    -fx-background-color: #E8F0FF;
+}
+.kt-dialog-pane .kt-dialog-symbol-warning {
+    -fx-text-fill: #B77905;
+    -fx-background-color: #FFF3DC;
+}
+.kt-dialog-pane .kt-dialog-symbol-error {
+    -fx-text-fill: #D43838;
+    -fx-background-color: #FDEAEA;
+}
+.kt-dialog-pane .kt-dialog-heading {
+    -fx-text-fill: #152F50;
+    -fx-font-size: 21px;
+    -fx-font-weight: bold;
+}
+.kt-dialog-pane .kt-dialog-subtitle {
+    -fx-text-fill: #778FAC;
+    -fx-font-size: 12px;
+}
+.kt-dialog-pane .kt-dialog-message {
+    -fx-text-fill: #263A54;
+    -fx-font-size: 14px;
+    -fx-line-spacing: 4px;
+    -fx-padding: 2 3 2 3;
+}
+.kt-dialog-pane .kt-dialog-info {
+    -fx-background-color: #EAF2FF;
+    -fx-background-radius: 10;
+    -fx-text-fill: #3666A8;
+    -fx-padding: 14 16;
+    -fx-font-size: 12px;
+}
+.kt-dialog-pane .kt-dialog-field-label {
+    -fx-text-fill: #35516F;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+.kt-dialog-pane .kt-dialog-input {
+    -fx-pref-height: 45;
+    -fx-min-height: 45;
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #CDDCEC;
+    -fx-border-radius: 9;
+    -fx-background-radius: 9;
+    -fx-border-width: 1;
+    -fx-font-size: 13px;
+    -fx-text-fill: #1B3656;
+    -fx-prompt-text-fill: #98ACC3;
+}
+.kt-dialog-pane .text-field.kt-dialog-input {
+    -fx-padding: 10 16;
+}
+.kt-dialog-pane .kt-dialog-input:focused {
+    -fx-border-color: #2563EB;
+    -fx-border-width: 1.4;
+    -fx-effect: dropshadow(gaussian, rgba(37,99,235,0.09), 6, 0, 0, 1);
+}
+.kt-dialog-pane .date-picker.kt-dialog-input,
+.kt-dialog-pane .combo-box.kt-dialog-input {
+    -fx-padding: 0;
+}
+.kt-dialog-pane .date-picker.kt-dialog-input > .text-field {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+    -fx-padding: 10 14;
+    -fx-text-fill: #1B3656;
+}
+.kt-dialog-pane .combo-box.kt-dialog-input > .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #1B3656;
+    -fx-padding: 9 12;
+}
+.kt-dialog-pane .date-picker.kt-dialog-input > .arrow-button,
+.kt-dialog-pane .combo-box.kt-dialog-input > .arrow-button {
+    -fx-background-color: #F3F7FD;
+    -fx-background-radius: 0 8 8 0;
+}
+.kt-dialog-pane .kt-dialog-primary-btn,
+.kt-dialog-pane .kt-dialog-cancel-btn,
+.kt-dialog-pane .kt-dialog-delete-btn {
+    -fx-background-radius: 9;
+    -fx-border-radius: 9;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 11 22;
+    -fx-min-width: 106;
+    -fx-cursor: hand;
+}
+.kt-dialog-pane .kt-dialog-primary-btn {
+    -fx-background-color: #2563EB;
+    -fx-text-fill: white;
+}
+.kt-dialog-pane .kt-dialog-primary-btn:hover { -fx-background-color: #174FCB; }
+.kt-dialog-pane .kt-dialog-cancel-btn {
+    -fx-background-color: #ECF2FA;
+    -fx-text-fill: #536D8D;
+}
+.kt-dialog-pane .kt-dialog-cancel-btn:hover { -fx-background-color: #DFE9F6; }
+.kt-dialog-pane .kt-dialog-delete-btn {
+    -fx-background-color: #DC3545;
+    -fx-text-fill: white;
+}
+.kt-dialog-pane .kt-dialog-delete-btn:hover { -fx-background-color: #BC2335; }

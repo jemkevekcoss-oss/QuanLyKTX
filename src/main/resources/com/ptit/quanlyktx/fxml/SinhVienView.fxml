@@ -41,7 +41,7 @@
                 <Label text="SV vào ở tháng này" styleClass="sv-stat-label" />
             </HBox>
             <Label fx:id="lblNewThisMonth" text="—" styleClass="sv-number-amber" />
-            <Label text="Theo ngày vào ở trong MySQL" styleClass="sv-stat-note" />
+            <Label text="Theo ngày vào ở trong cơ sở dữ liệu" styleClass="sv-stat-note" />
         </VBox>
     </HBox>
 
@@ -49,7 +49,7 @@
     <VBox spacing="14" styleClass="sv-panel" VBox.vgrow="ALWAYS">
         <VBox spacing="4">
             <Label text="Danh sách sinh viên nội trú" styleClass="sv-section-title" />
-            <Label text="Tra cứu và cập nhật hồ sơ sinh viên từ MySQL"
+            <Label text="Tra cứu và cập nhật hồ sơ từ cơ sở dữ liệu"
                    styleClass="sv-section-note" />
         </VBox>
 

@@ -14,12 +14,18 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 
+import java.net.URL;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
@@ -33,6 +39,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Consumer;
+import javafx.geometry.Insets;
 
 /** Màn Dịch vụ: Danh mục (CRUD), Lịch sử (CRUD), Thống kê sử dụng (truy vấn 2). */
 public class DichVuController {
@@ -189,7 +196,7 @@ public class DichVuController {
     @FXML private void handleAddService() {
         serviceForm(null).ifPresent(dv -> {
             try {
-                if (dichVuDAO.insert(dv)) { refreshAll(dv.getMaDV(), null); info("Đã thêm dịch vụ vào MySQL."); }
+                if (dichVuDAO.insert(dv)) { refreshAll(dv.getMaDV(), null); info("Dịch vụ đã được thêm vào cơ sở dữ liệu."); }
                 else warn("Không thêm được dịch vụ.");
             } catch (SQLException ex) { sqlError("Không thể thêm dịch vụ", ex); }
         });
@@ -207,7 +214,7 @@ public class DichVuController {
     @FXML private void handleDeleteService() {
         DichVu dv = tableServices.getSelectionModel().getSelectedItem();
         if (dv == null) { warn("Hãy chọn dịch vụ cần xóa."); return; }
-        if (!confirm("Xóa dịch vụ " + dv.getMaDV() + "?\nNếu đã có lịch sử sử dụng, MySQL sẽ chặn xóa khi có ràng buộc khóa ngoại.")) return;
+        if (!confirm("Xóa dịch vụ " + dv.getMaDV() + "?\nDịch vụ đã có lịch sử sử dụng sẽ không thể xóa để bảo toàn dữ liệu hóa đơn.")) return;
         try {
             if (dichVuDAO.delete(dv.getMaDV())) { refreshAll(null, null); info("Đã xóa dịch vụ."); }
             else warn("Dịch vụ không còn tồn tại.");
@@ -217,36 +224,51 @@ public class DichVuController {
     private Optional<DichVu> serviceForm(DichVu current) {
         boolean edit = current != null;
         Dialog<DichVu> dialog = new Dialog<>();
-        dialog.setTitle(edit ? "Sửa dịch vụ" : "Thêm dịch vụ");
-        dialog.setHeaderText("Thông tin bảng DICH_VU");
-        ButtonType save = new ButtonType("Lưu vào MySQL", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().setAll(save, ButtonType.CANCEL);
+        dialog.setTitle(edit ? "Cập nhật dịch vụ" : "Thêm dịch vụ");
+        prepareDialog(dialog);
+        ButtonType save = new ButtonType(edit ? "Lưu thay đổi" : "Thêm dịch vụ", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancel = new ButtonType("Hủy", ButtonBar.ButtonData.CANCEL_CLOSE);
+        dialog.getDialogPane().getButtonTypes().setAll(save, cancel);
 
         TextField ma = new TextField(edit ? current.getMaDV() : "");
         TextField ten = new TextField(edit ? current.getTenDV() : "");
         TextField gia = new TextField(edit ? current.getDonGia().toPlainString() : "");
         TextField dvt = new TextField(edit ? current.getDonViTinh() : "");
-        ma.setPromptText("VD: DV_GIAT"); ten.setPromptText("Tên dịch vụ");
-        gia.setPromptText("VD: 15000"); dvt.setPromptText("VD: kg, suất, bình...");
-        ma.setDisable(edit);
+        ma.setPromptText("Ví dụ: DV_GIAT");
+        ten.setPromptText("Nhập tên dịch vụ");
+        gia.setPromptText("Ví dụ: 15000");
+        dvt.setPromptText("Ví dụ: kg, suất, bình...");
+        ma.setDisable(edit); // Mã dịch vụ là khóa chính: không sửa.
+
         GridPane grid = formGrid();
-        addField(grid, 0, "Mã dịch vụ", ma);
-        addField(grid, 1, "Tên dịch vụ", ten);
-        addField(grid, 2, "Đơn giá (VNĐ)", gia);
-        addField(grid, 3, "Đơn vị tính", dvt);
-        Label err = errorLabel(); grid.add(err, 0, 4, 2, 1);
-        dialog.getDialogPane().setContent(grid);
-        dialog.getDialogPane().setPrefWidth(490);
+        grid.add(formField("Mã dịch vụ", ma, true), 0, 0);
+        grid.add(formField("Tên dịch vụ", ten, true), 1, 0);
+        grid.add(formField("Đơn giá (VNĐ)", gia, true), 0, 1);
+        grid.add(formField("Đơn vị tính", dvt, true), 1, 1);
+
+        Label err = errorLabel();
+        VBox content = dialogContent(
+                dialogHeading(edit ? "✎" : "+",
+                        edit ? "Cập nhật thông tin dịch vụ" : "Thêm dịch vụ mới",
+                        "Quản lý danh mục dịch vụ của ký túc xá."),
+                hintBox(edit ? "Mã dịch vụ được giữ nguyên khi chỉnh sửa hồ sơ."
+                             : "Điền đầy đủ 4 thông tin bắt buộc trước khi lưu."),
+                sectionTitle("THÔNG TIN DỊCH VỤ"), grid, err);
+        dialog.getDialogPane().setContent(content);
+        dialog.getDialogPane().setPrefWidth(700);
+        styleDialogButtons(dialog, save, cancel);
+
         Node saveBtn = dialog.getDialogPane().lookupButton(save);
         saveBtn.addEventFilter(ActionEvent.ACTION, ev -> {
             String error = validateService(ma.getText(), ten.getText(), gia.getText(), dvt.getText());
-            if (error != null) { err.setText(error); ev.consume(); }
+            if (error != null) { showFormError(err, error); ev.consume(); }
         });
         dialog.setResultConverter(btn -> btn == save
                 ? new DichVu(ma.getText().trim(), ten.getText().trim(),
-                    new BigDecimal(gia.getText().trim()), dvt.getText().trim()) : null);
+                        new BigDecimal(gia.getText().trim()), dvt.getText().trim()) : null);
         return dialog.showAndWait();
     }
+
     private String validateService(String ma, String ten, String gia, String dvt) {
         if (ma.isBlank() || ten.isBlank() || gia.isBlank() || dvt.isBlank()) return "Hãy nhập đầy đủ 4 trường.";
         if (ma.trim().length() > 20 || ten.trim().length() > 100 || dvt.trim().length() > 30)
@@ -267,14 +289,14 @@ public class DichVuController {
             try {
                 if (suDungDAO.update(sd)) {
                     refreshAll(null, sd.getIdSuDung()); runReport(); info("Đã sửa lượt sử dụng.");
-                } else warn("Lượt sử dụng này không còn trong MySQL.");
+                } else warn("Lượt sử dụng này không còn trong cơ sở dữ liệu.");
             } catch (SQLException ex) { sqlError("Không thể sửa lượt sử dụng", ex); }
         });
     }
     private void saveNewUsage(SuDungDichVu sd) {
         try {
             if (suDungDAO.insert(sd)) {
-                refreshAll(null, null); runReport(); info("Đã ghi nhận lượt sử dụng vào MySQL.");
+                refreshAll(null, null); runReport(); info("Đã ghi nhận lượt sử dụng vào cơ sở dữ liệu.");
             } else warn("Không thể ghi nhận lượt sử dụng.");
         } catch (SQLException ex) { sqlError("Không thể ghi nhận lượt sử dụng", ex); }
     }
@@ -282,7 +304,7 @@ public class DichVuController {
         LichSuDichVuRow row = tableUsages.getSelectionModel().getSelectedItem();
         if (row == null) { warn("Hãy chọn một lượt sử dụng cần xóa."); return; }
         int id = row.getSuDung().getIdSuDung();
-        if (!confirm("Xóa giao dịch #" + id + " khỏi MySQL? Việc này sẽ làm thay đổi tổng chi phí trong báo cáo.")) return;
+        if (!confirm("Xóa lượt sử dụng #" + id + "?\nThao tác sẽ xóa dữ liệu và làm thay đổi tổng chi phí trong báo cáo.")) return;
         try {
             if (suDungDAO.delete(id)) { refreshAll(null, null); runReport(); info("Đã xóa lượt sử dụng."); }
             else warn("Lượt sử dụng không còn tồn tại.");
@@ -305,9 +327,10 @@ public class DichVuController {
 
         Dialog<SuDungDichVu> dialog = new Dialog<>();
         dialog.setTitle(edit ? "Sửa lượt sử dụng #" + current.getIdSuDung() : "Ghi nhận sử dụng dịch vụ");
-        dialog.setHeaderText("Thành tiền được tính từ đơn giá và số lượng.");
-        ButtonType save = new ButtonType("Lưu vào MySQL", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().setAll(save, ButtonType.CANCEL);
+        prepareDialog(dialog);
+        ButtonType save = new ButtonType(edit ? "Lưu thay đổi" : "Ghi nhận sử dụng", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancel = new ButtonType("Hủy", ButtonBar.ButtonData.CANCEL_CLOSE);
+        dialog.getDialogPane().getButtonTypes().setAll(save, cancel);
 
         ComboBox<SinhVien> svBox = new ComboBox<>(FXCollections.observableArrayList(students));
         svBox.setConverter(new StringConverter<>() {
@@ -336,7 +359,7 @@ public class DichVuController {
         time.setPromptText("HH:mm, ví dụ 14:30");
         TextField count = new TextField(edit ? String.valueOf(current.getSoLuong()) : "1");
         Label preview = new Label("Thành tiền dự kiến: —");
-        preview.setStyle("-fx-text-fill: #1756B6; -fx-font-weight: bold;");
+        preview.getStyleClass().add("svc-money-preview-value");
 
         // Giữ nguyên đơn giá hiệu dụng của giao dịch cũ nếu chỉ sửa số lượng/ngày/SV.
         // Nếu đổi sang dịch vụ khác thì áp dụng đơn giá hiện tại của dịch vụ mới.
@@ -359,19 +382,30 @@ public class DichVuController {
         previewMoney.run();
 
         GridPane grid = formGrid();
-        addField(grid, 0, "Sinh viên", svBox);
-        addField(grid, 1, "Dịch vụ", dvBox);
-        addField(grid, 2, "Ngày sử dụng", day);
-        addField(grid, 3, "Giờ (HH:mm)", time);
-        addField(grid, 4, "Số lượng", count);
-        grid.add(preview, 1, 5);
-        Label err = errorLabel(); grid.add(err, 0, 6, 2, 1);
-        dialog.getDialogPane().setContent(grid);
-        dialog.getDialogPane().setPrefWidth(565);
+        grid.add(formField("Sinh viên", svBox, true), 0, 0, 2, 1);
+        grid.add(formField("Dịch vụ", dvBox, true), 0, 1, 2, 1);
+        grid.add(formField("Ngày sử dụng", day, true), 0, 2);
+        grid.add(formField("Giờ (HH:mm)", time, true), 1, 2);
+        grid.add(formField("Số lượng", count, true), 0, 3);
+        VBox moneyPreview = new VBox(7, preview);
+        moneyPreview.getStyleClass().add("svc-money-preview");
+        moneyPreview.setAlignment(Pos.CENTER_LEFT);
+        grid.add(moneyPreview, 1, 3);
+
+        Label err = errorLabel();
+        VBox content = dialogContent(
+                dialogHeading(edit ? "✎" : "+",
+                        edit ? "Cập nhật lượt sử dụng #" + current.getIdSuDung() : "Ghi nhận sử dụng dịch vụ",
+                        "Theo dõi lịch sử sử dụng và chi phí của sinh viên."),
+                hintBox("Thành tiền được tính từ đơn giá và số lượng; dữ liệu được lưu vào cơ sở dữ liệu."),
+                sectionTitle("THÔNG TIN SỬ DỤNG"), grid, err);
+        dialog.getDialogPane().setContent(content);
+        dialog.getDialogPane().setPrefWidth(700);
+        styleDialogButtons(dialog, save, cancel);
         Node saveBtn = dialog.getDialogPane().lookupButton(save);
         saveBtn.addEventFilter(ActionEvent.ACTION, ev -> {
             String message = validateUsage(svBox, dvBox, day, time, count, unitPrice.get());
-            if (message != null) { err.setText(message); ev.consume(); }
+            if (message != null) { showFormError(err, message); ev.consume(); }
         });
         dialog.setResultConverter(btn -> {
             if (btn != save) return null;
@@ -422,37 +456,240 @@ public class DichVuController {
         else warn("Chưa kết nối điều hướng tới mục Thống kê trong MainController.");
     }
 
+    // Chỉ trang trí Dialog; tất cả thao tác DAO, validation và truy vấn giữ nguyên.
+    private void prepareDialog(Dialog<?> dialog) {
+        DialogPane pane = dialog.getDialogPane();
+        pane.getStyleClass().add("svc-dialog-pane");
+        URL css = getClass().getResource("/com/ptit/quanlyktx/css/dichvu.css");
+        if (css != null) pane.getStylesheets().add(css.toExternalForm());
+        if (tabPane != null && tabPane.getScene() != null) {
+            dialog.initOwner(tabPane.getScene().getWindow());
+        }
+        pane.setMinHeight(Region.USE_PREF_SIZE);
+    }
+
+    private void styleDialogButtons(Dialog<?> dialog, ButtonType primary, ButtonType secondary) {
+        Node primaryButton = dialog.getDialogPane().lookupButton(primary);
+        Node secondaryButton = dialog.getDialogPane().lookupButton(secondary);
+        if (primaryButton != null) primaryButton.getStyleClass().add("svc-dialog-primary");
+        if (secondaryButton != null) secondaryButton.getStyleClass().add("svc-dialog-secondary");
+    }
+
+    private VBox dialogContent(Node... children) {
+        VBox content = new VBox(17);
+        content.getStyleClass().add("svc-dialog-content");
+        content.getChildren().addAll(children);
+        return content;
+    }
+
+    private HBox dialogHeading(String mark, String title, String subtitle) {
+        Label symbol = new Label(mark);
+        symbol.getStyleClass().add("svc-dialog-symbol");
+        VBox titles = new VBox(5);
+        Label heading = new Label(title);
+        heading.getStyleClass().add("svc-dialog-title");
+        Label sub = new Label(subtitle);
+        sub.getStyleClass().add("svc-dialog-subtitle");
+        sub.setWrapText(true);
+        titles.getChildren().addAll(heading, sub);
+        HBox header = new HBox(14, symbol, titles);
+        header.setAlignment(Pos.CENTER_LEFT);
+        header.getStyleClass().add("svc-dialog-header");
+        return header;
+    }
+
+    private HBox hintBox(String message) {
+        Label icon = new Label("i");
+        icon.getStyleClass().add("svc-hint-icon");
+        Label text = new Label(message);
+        text.getStyleClass().add("svc-hint-text");
+        text.setWrapText(true);
+        HBox.setHgrow(text, Priority.ALWAYS);
+        HBox box = new HBox(10, icon, text);
+        box.setAlignment(Pos.CENTER_LEFT);
+        box.getStyleClass().add("svc-dialog-hint");
+        return box;
+    }
+
+    private Label sectionTitle(String title) {
+        Label label = new Label(title);
+        label.getStyleClass().add("svc-form-section");
+        return label;
+    }
+
+//    private GridPane formGrid() {
+//        GridPane grid = new GridPane();
+//        grid.setPadding(
+//            new javafx.geometry.Insets(0, 20, 0, 20)
+//        );
+//        grid.setHgap(20);
+//        grid.setVgap(15);
+//        grid.getStyleClass().add("svc-form-grid");
+//        ColumnConstraints left = new ColumnConstraints();
+//        left.setPercentWidth(50);
+//        left.setHgrow(Priority.ALWAYS);
+//        ColumnConstraints right = new ColumnConstraints();
+//        right.setPercentWidth(50);
+//        right.setHgrow(Priority.ALWAYS);
+//        grid.getColumnConstraints().addAll(left, right);
+//        return grid;
+//    }
+
     private GridPane formGrid() {
         GridPane grid = new GridPane();
-        grid.setHgap(12); grid.setVgap(11); grid.setPadding(new Insets(13));
+
+        grid.setPadding(new Insets(0, 20, 0, 20));
+        grid.setHgap(20);
+        grid.setVgap(15);
+
+        grid.getStyleClass().add("svc-form-grid");
+
+        ColumnConstraints left = new ColumnConstraints();
+        left.setHgrow(Priority.ALWAYS);
+        left.setFillWidth(true);
+
+        ColumnConstraints right = new ColumnConstraints();
+        right.setHgrow(Priority.ALWAYS);
+        right.setFillWidth(true);
+
+        // Không dùng setPercentWidth(50)
+        // để tránh xung đột với khoảng cách giữa các cột
+        grid.getColumnConstraints().addAll(left, right);
+
         return grid;
     }
-    private void addField(GridPane grid, int y, String title, Node control) {
-        grid.add(new Label(title), 0, y);
-        grid.add(control, 1, y);
+
+//    private VBox formField(String title, Control control, boolean required) {
+//        Label label = new Label(title + (required ? " *" : ""));
+//        label.getStyleClass().add("svc-form-label");
+//        control.getStyleClass().add("svc-form-input");
+//        control.setMaxWidth(Double.MAX_VALUE);
+//        control.setPrefHeight(44);
+//        VBox group = new VBox(7, label, control);
+//        group.setMaxWidth(Double.MAX_VALUE);
+//        group.getStyleClass().add("svc-form-group");
+//        return group;
+//    }
+
+    private VBox formField(String title, Control control, boolean required) {
+        Label label = new Label(title + (required ? " *" : ""));
+        label.getStyleClass().add("svc-form-label");
+
+        control.getStyleClass().add("svc-form-input");
+
+        control.setMinWidth(0);
+        control.setPrefWidth(0);
+        control.setMaxWidth(Double.MAX_VALUE);
+        control.setPrefHeight(44);
+
+        VBox group = new VBox(7, label, control);
+        group.setMinWidth(0);
+        group.setPrefWidth(0);
+        group.setMaxWidth(Double.MAX_VALUE);
+
+        group.getStyleClass().add("svc-form-group");
+
+        GridPane.setHgrow(group, Priority.ALWAYS);
+        GridPane.setFillWidth(group, true);
+
+        return group;
     }
+
+    
+    
+    
     private Label errorLabel() {
-        Label err = new Label(); err.setWrapText(true);
-        err.setStyle("-fx-text-fill: #B42318;"); return err;
+        Label err = new Label();
+        err.getStyleClass().add("svc-form-error");
+        err.setWrapText(true);
+        err.setVisible(false);
+        err.setManaged(false);
+        return err;
     }
+
+    private void showFormError(Label err, String message) {
+        err.setText(message);
+        err.setVisible(true);
+        err.setManaged(true);
+    }
+
+    private VBox messageContent(Alert.AlertType type, String headline, String message) {
+        Label symbol = new Label(switch (type) {
+            case ERROR -> "×";
+            case WARNING -> "!";
+            case CONFIRMATION -> "?";
+            default -> "✓";
+        });
+        symbol.getStyleClass().addAll("svc-msg-symbol", switch (type) {
+            case ERROR -> "svc-msg-error";
+            case WARNING -> "svc-msg-warning";
+            case CONFIRMATION -> "svc-msg-question";
+            default -> "svc-msg-success";
+        });
+        Label title = new Label(headline);
+        title.getStyleClass().add("svc-msg-title");
+        Label detail = new Label(message);
+        detail.getStyleClass().add("svc-msg-detail");
+        detail.setWrapText(true);
+        detail.setMaxWidth(Double.MAX_VALUE);
+        detail.setMinHeight(Region.USE_PREF_SIZE);
+        VBox text = new VBox(8, title, detail);
+        text.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(text, Priority.ALWAYS);
+        HBox top = new HBox(15, symbol, text);
+        top.setAlignment(Pos.TOP_LEFT);
+        VBox box = new VBox(top);
+        box.getStyleClass().add("svc-message-content");
+        return box;
+    }
+
     private boolean confirm(String message) {
-        Alert dialog = new Alert(Alert.AlertType.CONFIRMATION, message, ButtonType.YES, ButtonType.NO);
-        dialog.setTitle("Xác nhận");
-        return dialog.showAndWait().orElse(ButtonType.NO) == ButtonType.YES;
+        Alert dialog = new Alert(Alert.AlertType.CONFIRMATION);
+        dialog.setTitle("Xác nhận xóa");
+        dialog.setHeaderText(null);
+        dialog.getDialogPane().setGraphic(null);
+        prepareDialog(dialog);
+        ButtonType delete = new ButtonType("Xóa", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancel = new ButtonType("Hủy", ButtonBar.ButtonData.CANCEL_CLOSE);
+        dialog.getDialogPane().getButtonTypes().setAll(delete, cancel);
+        dialog.getDialogPane().setContent(messageContent(Alert.AlertType.CONFIRMATION,
+                "Xác nhận xóa dữ liệu", message));
+        dialog.getDialogPane().setPrefWidth(565);
+        styleDialogButtons(dialog, delete, cancel);
+        dialog.getDialogPane().lookupButton(delete).getStyleClass().remove("svc-dialog-primary");
+        dialog.getDialogPane().lookupButton(delete).getStyleClass().add("svc-dialog-danger");
+        return dialog.showAndWait().orElse(cancel) == delete;
     }
+
+    private void showNotice(Alert.AlertType type, String headline, String message) {
+        Alert dialog = new Alert(type);
+        dialog.setTitle("Quản lý dịch vụ");
+        dialog.setHeaderText(null);
+        dialog.getDialogPane().setGraphic(null);
+        prepareDialog(dialog);
+        ButtonType close = new ButtonType("Đã hiểu", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().setAll(close);
+        dialog.getDialogPane().setContent(messageContent(type, headline, message));
+        dialog.getDialogPane().setPrefWidth(565);
+        styleDialogButtons(dialog, close, close);
+        // Với một nút duy nhất, giữ kiểu nút chính.
+        Node btn = dialog.getDialogPane().lookupButton(close);
+        btn.getStyleClass().remove("svc-dialog-secondary");
+        btn.getStyleClass().add("svc-dialog-primary");
+        dialog.showAndWait();
+    }
+
     private void info(String msg) {
-        Alert dialog = new Alert(Alert.AlertType.INFORMATION, msg, ButtonType.OK);
-        dialog.setTitle("Quản lý dịch vụ"); dialog.showAndWait();
+        showNotice(Alert.AlertType.INFORMATION, "Thành công", msg);
     }
     private void warn(String msg) {
-        Alert dialog = new Alert(Alert.AlertType.WARNING, msg, ButtonType.OK);
-        dialog.setTitle("Quản lý dịch vụ"); dialog.showAndWait();
+        showNotice(Alert.AlertType.WARNING, "Cần kiểm tra thông tin", msg);
     }
     private void sqlError(String title, SQLException ex) {
         String explanation = ex.getSQLState() != null && ex.getSQLState().startsWith("23")
                 ? "Có thể trùng khóa, sai khóa ngoại hoặc dữ liệu đang được tham chiếu.\n" : "";
-        Alert dialog = new Alert(Alert.AlertType.ERROR, explanation + ex.getMessage(), ButtonType.OK);
-        dialog.setTitle("MySQL - " + title); dialog.setHeaderText(title); dialog.showAndWait();
+        String detail = explanation + (ex.getMessage() == null ? "Vui lòng thử lại." : ex.getMessage());
+        showNotice(Alert.AlertType.ERROR, title, detail);
         ex.printStackTrace();
     }
 }

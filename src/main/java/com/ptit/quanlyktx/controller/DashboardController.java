@@ -56,10 +56,10 @@ public class DashboardController {
             lblTyLe.setText(String.format(java.util.Locale.forLanguageTag("vi-VN"), "%.1f%%", 100 * ratio));
             arcDaO.setLength(-360.0 * Math.min(1, Math.max(0, ratio)));
             hienThiPhong(x.topPhong());
-            lblCapNhat.setText("Đã cập nhật lúc " + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+            //lblCapNhat.setText("Đã cập nhật lúc " + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
         } catch (SQLException | RuntimeException e) {
-            lblCapNhat.setText("Không tải được dữ liệu từ MySQL");
-            new Alert(Alert.AlertType.ERROR, "Lỗi tải Tổng quan từ MySQL:\n" + e.getMessage()).showAndWait();
+            //lblCapNhat.setText("Không tải được dữ liệu từ CSDL");
+            new Alert(Alert.AlertType.ERROR, "Không thể tải dữ liệu Tổng quan từ cơ sở dữ liệu:\n" + e.getMessage()).showAndWait();
         }
     }
 

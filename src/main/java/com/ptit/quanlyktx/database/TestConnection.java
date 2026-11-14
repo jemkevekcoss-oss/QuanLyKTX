@@ -1,34 +1,34 @@
 package com.ptit.quanlyktx.database;
 
 import java.sql.Connection;
-import java.sql.SQLException;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 public class TestConnection {
 
     public static void main(String[] args) {
 
-        try (Connection conn =
-                DatabaseConnection.getConnection()) {
+        System.out.println("Duong dan CSDL: "
+                + DatabaseConnection.getDatabasePath());
 
-            System.out.println("Kết nối MySQL thành công!");
+        try (
+            Connection conn = DatabaseConnection.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(
+                    "SELECT COUNT(*) FROM SINH_VIEN"
+            )
+        ) {
 
-            System.out.println(
-                "Database: " + conn.getCatalog()
-            );
+            System.out.println("Ket noi SQLite thanh cong!");
 
-        } catch (SQLException e) {
+            if (rs.next()) {
+                System.out.println(
+                    "Tong so sinh vien: " + rs.getInt(1)
+                );
+            }
 
-            System.out.println("Kết nối thất bại!");
-            System.out.println(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
-
-
-
-/*
-Nếu thành công, kết quả in ra là:
-Kết nối MySQL thành công!
-Database: quanlyktx
-
-*/

@@ -6,11 +6,18 @@ import com.ptit.quanlyktx.dto.LichSuDichVuRow;
 import com.ptit.quanlyktx.model.SuDungDichVu;
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Quản lý các giao dịch và truy vấn 2: tổng hợp tiền từng dịch vụ theo SV. */
+/** Quan ly lich su su dung dich vu va thong ke chi phi theo khoang ngay. */
 public class SuDungDichVuDAO {
+
+    // SQLite luu thoi diem duoi dang TEXT: yyyy-MM-dd HH:mm:ss.
+    private static final DateTimeFormatter DB_DATETIME =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
     public List<LichSuDichVuRow> findAll() throws SQLException {
         String sql = """
             SELECT sd.id_su_dung, sd.ma_sv, sd.ma_dv, sd.thoi_gian_su_dung,
@@ -25,13 +32,20 @@ public class SuDungDichVuDAO {
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                Timestamp ts = rs.getTimestamp("thoi_gian_su_dung");
+                String rawTime = rs.getString("thoi_gian_su_dung");
+                LocalDateTime time = rawTime == null
+                        ? null : LocalDateTime.parse(rawTime.trim().replace(' ', 'T'));
                 SuDungDichVu sd = new SuDungDichVu(
-                    rs.getInt("id_su_dung"), rs.getString("ma_sv"), rs.getString("ma_dv"),
-                    ts == null ? null : ts.toLocalDateTime(), rs.getInt("so_luong"),
-                    rs.getBigDecimal("thanh_tien"));
-                result.add(new LichSuDichVuRow(sd, rs.getString("ho_ten"),
-                        rs.getString("ten_dv"), rs.getString("don_vi_tinh")));
+                        rs.getInt("id_su_dung"),
+                        rs.getString("ma_sv"),
+                        rs.getString("ma_dv"),
+                        time,
+                        rs.getInt("so_luong"),
+                        rs.getBigDecimal("thanh_tien"));
+                result.add(new LichSuDichVuRow(sd,
+                        rs.getString("ho_ten"),
+                        rs.getString("ten_dv"),
+                        rs.getString("don_vi_tinh")));
             }
         }
         return result;
@@ -73,8 +87,9 @@ public class SuDungDichVuDAO {
         }
     }
 
-    /** Lọc từ 00:00 ngày đầu đến trước 00:00 ngày sau ngày cuối. */
-    public List<ChiPhiDichVuRow> thongKeSuDung(LocalDate from, LocalDate to) throws SQLException {
+    /** Loc tu dau ngay bat dau den truoc 00:00 ngay sau ngay ket thuc. */
+    public List<ChiPhiDichVuRow> thongKeSuDung(LocalDate from, LocalDate to)
+            throws SQLException {
         if (from == null || to == null || to.isBefore(from)) {
             throw new IllegalArgumentException("Khoảng ngày không hợp lệ");
         }
@@ -92,13 +107,18 @@ public class SuDungDichVuDAO {
         List<ChiPhiDichVuRow> result = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setTimestamp(1, Timestamp.valueOf(from.atStartOfDay()));
-            ps.setTimestamp(2, Timestamp.valueOf(to.plusDays(1).atStartOfDay()));
+            // Bind cung dinh dang voi TEXT datetime da luu trong SQLite.
+            ps.setString(1, from.atStartOfDay().format(DB_DATETIME));
+            ps.setString(2, to.plusDays(1).atStartOfDay().format(DB_DATETIME));
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    result.add(new ChiPhiDichVuRow(rs.getString("ma_sv"), rs.getString("ho_ten"),
-                        rs.getString("ten_dv"), rs.getString("don_vi_tinh"),
-                        rs.getLong("tong_so_luong"), rs.getBigDecimal("tong_tien")));
+                    result.add(new ChiPhiDichVuRow(
+                            rs.getString("ma_sv"),
+                            rs.getString("ho_ten"),
+                            rs.getString("ten_dv"),
+                            rs.getString("don_vi_tinh"),
+                            rs.getLong("tong_so_luong"),
+                            rs.getBigDecimal("tong_tien")));
                 }
             }
         }
@@ -106,9 +126,12 @@ public class SuDungDichVuDAO {
     }
 
     private void bindFields(PreparedStatement ps, SuDungDichVu sd) throws SQLException {
+        if (sd.getThoiGianSuDung() == null) {
+            throw new SQLException("Thời gian sử dụng dịch vụ không được để trống.");
+        }
         ps.setString(1, sd.getMaSV());
         ps.setString(2, sd.getMaDV());
-        ps.setTimestamp(3, Timestamp.valueOf(sd.getThoiGianSuDung()));
+        ps.setString(3, sd.getThoiGianSuDung().format(DB_DATETIME));
         ps.setInt(4, sd.getSoLuong());
         ps.setBigDecimal(5, sd.getThanhTien());
     }

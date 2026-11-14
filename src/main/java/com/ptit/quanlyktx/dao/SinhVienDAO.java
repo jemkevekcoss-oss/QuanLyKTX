@@ -4,11 +4,11 @@ import com.ptit.quanlyktx.database.DatabaseConnection;
 import com.ptit.quanlyktx.model.SinhVien;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,11 +33,11 @@ public class SinhVienDAO {
                     rs.getString("ma_sv"),
                     rs.getString("so_cmt"),
                     rs.getString("ho_ten"),
-                    asLocalDate(rs.getDate("ngay_sinh")),
+                    docNgay(rs, "ngay_sinh"),
                     rs.getString("lop"),
                     rs.getString("que_quan"),
                     rs.getString("so_phong"),
-                    asLocalDate(rs.getDate("ngay_vao_o"))
+                    docNgay(rs, "ngay_vao_o")
                 ));
             }
         }
@@ -60,11 +60,11 @@ public class SinhVienDAO {
             ps.setString(1, sv.getMaSV());
             ps.setString(2, sv.getSoCmt());
             ps.setString(3, sv.getHoTen());
-            ps.setDate(4, Date.valueOf(sv.getNgaySinh()));
+            ps.setString(4, sv.getNgaySinh().toString());
             ps.setString(5, sv.getLop());
             ps.setString(6, sv.getQueQuan());
             ps.setString(7, sv.getSoPhong());
-            ps.setDate(8, Date.valueOf(sv.getNgayVaoO()));
+            ps.setString(8, sv.getNgayVaoO().toString());
 
             return ps.executeUpdate() == 1;
         }
@@ -89,11 +89,11 @@ public class SinhVienDAO {
 
             ps.setString(1, sv.getSoCmt());
             ps.setString(2, sv.getHoTen());
-            ps.setDate(3, Date.valueOf(sv.getNgaySinh()));
+            ps.setString(3, sv.getNgaySinh().toString());
             ps.setString(4, sv.getLop());
             ps.setString(5, sv.getQueQuan());
             ps.setString(6, sv.getSoPhong());
-            ps.setDate(7, Date.valueOf(sv.getNgayVaoO()));
+            ps.setString(7, sv.getNgayVaoO().toString());
             ps.setString(8, sv.getMaSV());
 
             return ps.executeUpdate() == 1;
@@ -115,8 +115,17 @@ public class SinhVienDAO {
         }
     } 
     
-    private static LocalDate asLocalDate(Date value) {
-        return value == null ? null : value.toLocalDate();
+    /** SQLite luu DATE theo chuoi ISO yyyy-MM-dd. */
+    private static LocalDate docNgay(ResultSet rs, String cot) throws SQLException {
+        String ngay = rs.getString(cot);
+        if (ngay == null) {
+            throw new SQLException("Thieu ngay tai cot " + cot + " trong SINH_VIEN");
+        }
+        try {
+            return LocalDate.parse(ngay);
+        } catch (DateTimeParseException e) {
+            throw new SQLException("Ngay khong hop le tai cot " + cot + ": " + ngay, e);
+        }
     }
     
 }

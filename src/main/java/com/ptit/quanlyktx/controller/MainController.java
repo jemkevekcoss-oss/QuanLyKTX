@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
@@ -15,6 +16,16 @@ public class MainController {
     // fx:id phải khớp MainView.fxml hiện tại.
     @FXML private Label pageTitle;
     @FXML private VBox contentArea;
+
+    // Sidebar icons: only visual active state, no changes to business logic.
+    @FXML private Button navDashboard;
+    @FXML private Button navStudents;
+    @FXML private Button navRooms;
+    @FXML private Button navVisitors;
+    @FXML private Button navServices;
+    @FXML private Button navParking;
+    @FXML private Button navBills;
+    @FXML private Button navReports;
 
     @FXML
     private void initialize() {
@@ -47,6 +58,7 @@ public class MainController {
 
             contentArea.getChildren().setAll(view);
             pageTitle.setText(title);
+            highlightActiveNavigation(fxmlFile);
         } catch (IOException | RuntimeException ex) {
 
             ex.printStackTrace();
@@ -101,6 +113,32 @@ public class MainController {
         VBox panel = new VBox(15, heading, description);
         panel.getStyleClass().add("content-panel");
         contentArea.getChildren().add(panel);
+    }
+
+    private void highlightActiveNavigation(String fxmlFile) {
+        Button[] navButtons = {
+            navDashboard, navStudents, navRooms, navVisitors,
+            navServices, navParking, navBills, navReports
+        };
+        for (Button button : navButtons) {
+            if (button != null) {
+                button.getStyleClass().remove("nav-button-active");
+            }
+        }
+        Button selected = switch (fxmlFile) {
+            case "DashboardView.fxml" -> navDashboard;
+            case "SinhVienView.fxml" -> navStudents;
+            case "PhongView.fxml" -> navRooms;
+            case "KhachThamView.fxml" -> navVisitors;
+            case "DichVuView.fxml" -> navServices;
+            case "GuiXeView.fxml" -> navParking;
+            case "HoaDonView.fxml" -> navBills;
+            case "ThongKeView.fxml" -> navReports;
+            default -> null;
+        };
+        if (selected != null && !selected.getStyleClass().contains("nav-button-active")) {
+            selected.getStyleClass().add("nav-button-active");
+        }
     }
 
     private void showError(String message) {

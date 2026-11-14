@@ -197,7 +197,8 @@
                             <TextField fx:id="txtHistorySearch" HBox.hgrow="ALWAYS"
                                        promptText="⌕  Biển số, mã vé, mã SV..." prefHeight="38"
                                        styleClass="parking-search"/>
-                            <ComboBox fx:id="cbHistoryStatus" prefWidth="135"/>
+                            <ComboBox fx:id="cbHistoryStatus" prefWidth="175" minWidth="175"
+                                      styleClass="parking-history-filter"/>
                             <Button text="Tra cứu" onAction="#handleSearchHistory" styleClass="parking-primary"/>
                             <Button text="⟳" onAction="#handleRefreshHistory" styleClass="parking-outline"/>
                         </HBox>

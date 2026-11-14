@@ -1,10 +1,40 @@
+/* PTIT KTX - sidebar branding + vector icons. Other page styles unchanged. */
 .app-root { -fx-font-family: "Segoe UI", Arial, sans-serif; -fx-background-color: #F4F7FB; }
 .sidebar { -fx-background-color: #14263D; }
-.brand { -fx-text-fill: white; -fx-font-size: 25px; -fx-font-weight: bold; }
-.brand-sub { -fx-text-fill: #A9B7CB; -fx-font-size: 11px; }
+.brand-header { -fx-padding: 3 0 10 0; }
+.brand-logo-box {
+    -fx-background-color: transparent;
+    -fx-background-radius: 14;
+    -fx-border-color: transparent;
+    -fx-border-radius: 14;
+}
+.brand { -fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold; }
+.brand-sub { -fx-text-fill: #B7C6D8; -fx-font-size: 10px; }
+.sidebar .separator { -fx-padding: 2 0 8 0; }
 .sidebar .separator .line { -fx-border-color: #334861; }
-.nav-button { -fx-alignment: CENTER_LEFT; -fx-background-color: transparent; -fx-text-fill: #D9E4F3; -fx-font-size: 14px; -fx-padding: 12 14; -fx-background-radius: 8; -fx-cursor: hand; }
+.nav-button {
+    -fx-alignment: CENTER_LEFT;
+    -fx-content-display: LEFT;
+    -fx-graphic-text-gap: 14;
+    -fx-min-height: 46;
+    -fx-pref-height: 46;
+    -fx-background-color: transparent;
+    -fx-text-fill: #D9E4F3;
+    -fx-font-size: 14px;
+    -fx-padding: 10 12;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+}
+.nav-button .nav-icon { -fx-stroke: #C8D7EC; -fx-fill: transparent; }
 .nav-button:hover { -fx-background-color: #294A70; -fx-text-fill: white; }
+.nav-button:hover .nav-icon { -fx-stroke: white; }
+.nav-button-active {
+    -fx-background-color: #2563EB;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+.nav-button-active .nav-icon { -fx-stroke: white; }
+.nav-button-active:hover { -fx-background-color: #1D4ED8; }
 .main-content { -fx-background-color: #F4F7FB; }
 .eyebrow { -fx-text-fill: #64748B; -fx-font-size: 11px; -fx-font-weight: bold; }
 .page-title { -fx-text-fill: #14263D; -fx-font-size: 27px; -fx-font-weight: bold; }

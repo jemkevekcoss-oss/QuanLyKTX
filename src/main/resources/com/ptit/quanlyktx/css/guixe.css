@@ -87,10 +87,10 @@
 
 /* --- Dialog chi tiết vé tháng --- */
 .parking-detail-dialog { -fx-background-color: #FFFFFF; -fx-font-family: "Segoe UI", "Arial"; }
-.parking-detail-dialog > .content { -fx-padding: 0; }
-.parking-detail-dialog .button-bar { -fx-padding: 4 20 17 20; }
+.parking-detail-dialog > .content { -fx-padding: 20 28 10 28; }
+.parking-detail-dialog > .button-bar > .container { -fx-padding: 8 28 20 28; }
 .parking-detail-dialog .button-bar .button { -fx-min-width: 122; -fx-font-size: 12px; }
-.parking-detail-content { -fx-padding: 22 22 12 22; -fx-background-color: #FFFFFF; }
+.parking-detail-content { -fx-padding: 0; -fx-background-color: #FFFFFF; }
 .parking-detail-heading { -fx-font-size: 22px; -fx-text-fill: #142B4A; -fx-font-weight: bold; }
 .parking-detail-subheading { -fx-font-size: 12px; -fx-text-fill: #7588A1; }
 .parking-detail-badge { -fx-background-radius: 30; -fx-padding: 7 12; -fx-font-weight: bold; -fx-font-size: 12px; }
@@ -117,10 +117,12 @@
 
 /* --- Dialog Sửa / Đăng ký và Gia hạn vé tháng (cùng phong cách Chi tiết vé) --- */
 .parking-form-dialog { -fx-background-color: #FFFFFF; -fx-font-family: "Segoe UI", "Arial"; }
-.parking-form-dialog > .content { -fx-padding: 0; -fx-background-color: #FFFFFF; }
-.parking-form-dialog .button-bar { -fx-background-color: #FFFFFF; -fx-padding: 4 22 18 22; }
+.parking-form-dialog > .content { -fx-padding: 22 30 12 30; -fx-background-color: #FFFFFF; }
+.parking-form-dialog > .button-bar > .container { -fx-background-color: #FFFFFF; -fx-padding: 6 30 20 30; }
 .parking-form-dialog .button-bar .button { -fx-min-width: 105; -fx-min-height: 38; -fx-font-size: 12px; }
-.parking-form-content { -fx-padding: 23 24 12 24; -fx-background-color: #FFFFFF; }
+.parking-form-content { -fx-padding: 0; -fx-background-color: #FFFFFF; }
+.parking-form-symbol { -fx-background-color: #E8F0FF; -fx-background-radius: 12;
+    -fx-text-fill: #2563EB; -fx-font-size: 23px; -fx-font-weight: bold; }
 .parking-form-heading { -fx-font-size: 21px; -fx-font-weight: bold; -fx-text-fill: #142B4A; }
 .parking-form-subheading { -fx-font-size: 12px; -fx-text-fill: #6C819F; }
 .parking-form-card { -fx-background-color: #E9F1FE; -fx-background-radius: 12; -fx-padding: 16 19; }
@@ -148,3 +150,43 @@
 .parking-form-cancel-button { -fx-background-color: #F2F5FA; -fx-text-fill: #465D79;
     -fx-background-radius: 8; -fx-padding: 10 15; -fx-cursor: hand; }
 .parking-form-cancel-button:hover { -fx-background-color: #E4EBF5; }
+
+/* Lọc lịch sử và nhấn mạnh lượt có phí phát sinh (chỉ ảnh hưởng tab Gửi xe). */
+.parking-page .combo-box.parking-history-filter {
+    -fx-border-color: #BED0E9;
+    -fx-border-radius: 7;
+    -fx-background-radius: 7;
+    -fx-background-color: #FFFFFF;
+}
+.parking-page .combo-box.parking-history-filter:focused {
+    -fx-border-color: #2563EB;
+}
+.parking-table .table-cell.parking-fee-positive {
+    -fx-text-fill: #C24135;
+    -fx-font-weight: bold;
+}
+
+/* -------- Cửa sổ thông báo dùng chung: không ảnh hưởng các trang khác -------- */
+.parking-notice-dialog { -fx-background-color: #FFFFFF; -fx-font-family: "Segoe UI", "Arial"; }
+.parking-notice-dialog > .content { -fx-padding: 22 26 12 26; -fx-background-color: #FFFFFF; }
+.parking-notice-dialog > .button-bar > .container { -fx-padding: 8 26 20 26; -fx-background-color: #FFFFFF; }
+.parking-notice-dialog .button-bar .button { -fx-min-width: 115; -fx-min-height: 39; -fx-font-size: 13px; }
+.parking-notice-content { -fx-padding: 0; -fx-background-color: #FFFFFF; }
+.parking-notice-content .separator .line { -fx-border-color: #E7EDF5; -fx-border-width: 1 0 0 0; }
+.parking-notice-icon { -fx-font-size: 26px; -fx-font-weight: bold; -fx-background-radius: 12; }
+.parking-notice-icon.parking-notice-success { -fx-background-color: #E3F4EC; -fx-text-fill: #0A875A; }
+.parking-notice-icon.parking-notice-warning { -fx-background-color: #FFF0DB; -fx-text-fill: #B77916; }
+.parking-notice-icon.parking-notice-error { -fx-background-color: #FCE7E8; -fx-text-fill: #DB303D; }
+.parking-notice-icon.parking-notice-confirm { -fx-background-color: #E6F0FF; -fx-text-fill: #2563EB; }
+.parking-notice-heading { -fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #142B4A; }
+.parking-notice-subtitle { -fx-font-size: 11px; -fx-text-fill: #70839E; }
+.parking-notice-message { -fx-font-size: 13px; -fx-text-fill: #34506E; }
+.parking-notice-confirm-button { -fx-background-color: #2563EB; -fx-background-radius: 8;
+    -fx-text-fill: #FFFFFF; -fx-font-weight: bold; -fx-cursor: hand; }
+.parking-notice-confirm-button:hover { -fx-background-color: #1756D1; }
+.parking-notice-danger-button { -fx-background-color: #DC3545; -fx-background-radius: 8;
+    -fx-text-fill: #FFFFFF; -fx-font-weight: bold; -fx-cursor: hand; }
+.parking-notice-danger-button:hover { -fx-background-color: #BF2233; }
+.parking-notice-cancel-button { -fx-background-color: #F0F4FA; -fx-background-radius: 8;
+    -fx-text-fill: #4A607B; -fx-cursor: hand; }
+.parking-notice-cancel-button:hover { -fx-background-color: #E4EAF3; }

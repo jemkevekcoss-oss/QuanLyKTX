@@ -2,13 +2,13 @@ package com.ptit.quanlyktx.dao;
 
 import com.ptit.quanlyktx.database.DatabaseConnection;
 import com.ptit.quanlyktx.model.DichVu;
-import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/** DAO cho bảng DICH_VU. Không chứa xử lý JavaFX. */
+/** Truy cap bang DICH_VU qua SQLite JDBC; khong xu ly giao dien. */
 public class DichVuDAO {
+
     public List<DichVu> findAll() throws SQLException {
         String sql = "SELECT ma_dv, ten_dv, don_gia, don_vi_tinh FROM DICH_VU ORDER BY ma_dv";
         List<DichVu> result = new ArrayList<>();
@@ -16,8 +16,11 @@ public class DichVuDAO {
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                result.add(new DichVu(rs.getString("ma_dv"), rs.getString("ten_dv"),
-                        rs.getBigDecimal("don_gia"), rs.getString("don_vi_tinh")));
+                result.add(new DichVu(
+                        rs.getString("ma_dv"),
+                        rs.getString("ten_dv"),
+                        rs.getBigDecimal("don_gia"),
+                        rs.getString("don_vi_tinh")));
             }
         }
         return result;
@@ -45,43 +48,37 @@ public class DichVuDAO {
     }
 
     public boolean delete(String maDV) throws SQLException {
-        // Không xóa dịch vụ đã phát sinh giao dịch, kể cả khi FK bị khai báo CASCADE.
-        // Khóa bản ghi cha trong transaction để tránh chèn đồng thời khi đang xóa.
+        // SQLite khong co SELECT ... FOR UPDATE. Dung mot DELETE co dieu kien:
+        // chi xoa dich vu neu chua tung phat sinh giao dich su dung.
+        String deleteSql = """
+            DELETE FROM DICH_VU
+            WHERE ma_dv = ?
+              AND NOT EXISTS (
+                  SELECT 1 FROM SU_DUNG_DICH_VU WHERE ma_dv = ?
+              )
+            """;
         try (Connection conn = DatabaseConnection.getConnection()) {
-            conn.setAutoCommit(false);
-            try {
-                try (PreparedStatement lock = conn.prepareStatement(
-                        "SELECT ma_dv FROM DICH_VU WHERE ma_dv=? FOR UPDATE")) {
-                    lock.setString(1, maDV);
-                    try (ResultSet rs = lock.executeQuery()) {
-                        if (!rs.next()) { conn.rollback(); return false; }
-                    }
+            try (PreparedStatement ps = conn.prepareStatement(deleteSql)) {
+                ps.setString(1, maDV);
+                ps.setString(2, maDV);
+                if (ps.executeUpdate() == 1) {
+                    return true;
                 }
-                try (PreparedStatement check = conn.prepareStatement(
-                        "SELECT 1 FROM SU_DUNG_DICH_VU WHERE ma_dv=? LIMIT 1")) {
-                    check.setString(1, maDV);
-                    try (ResultSet rs = check.executeQuery()) {
-                        if (rs.next()) {
-                            throw new SQLIntegrityConstraintViolationException(
-                                "Dịch vụ đã có lịch sử sử dụng, không được xóa. "
-                                + "Hãy giữ lại để bảo toàn dữ liệu hóa đơn.");
-                        }
-                    }
-                }
-                int changed;
-                try (PreparedStatement ps = conn.prepareStatement(
-                        "DELETE FROM DICH_VU WHERE ma_dv=?")) {
-                    ps.setString(1, maDV);
-                    changed = ps.executeUpdate();
-                }
-                conn.commit();
-                return changed == 1;
-            } catch (SQLException ex) {
-                conn.rollback();
-                throw ex;
-            } finally {
-                conn.setAutoCommit(true);
             }
+
+            // Neu khong xoa duoc: phan biet ma khong ton tai va ma da co lich su.
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "SELECT 1 FROM DICH_VU WHERE ma_dv=?")) {
+                ps.setString(1, maDV);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (!rs.next()) {
+                        return false;
+                    }
+                }
+            }
+            throw new SQLIntegrityConstraintViolationException(
+                    "Dịch vụ đã có lịch sử sử dụng, không được xóa. "
+                    + "Hãy giữ lại để bảo toàn dữ liệu hóa đơn.");
         }
     }
 

@@ -6,9 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.sql.Types;
-import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,18 +52,21 @@ public class HoaDonDAO {
     /** maSV == null: tất cả SV; khác null: một SV. */
     public List<HoaDonRow> findByMonth(YearMonth month, String maSV) throws SQLException {
         if (month == null) throw new IllegalArgumentException("Thiếu tháng cần thống kê");
-        LocalDateTime from = month.atDay(1).atStartOfDay();
-        LocalDateTime untilExclusive = month.plusMonths(1).atDay(1).atStartOfDay();
+        // SQLite luu DATE bang YYYY-MM-DD, DATETIME bang YYYY-MM-DD HH:mm:ss.
+        // So sanh theo chuoi ISO de khong phu thuoc setTimestamp() cua MySQL.
+        String from = month.atDay(1) + " 00:00:00";
+        String untilExclusive = month.plusMonths(1).atDay(1) + " 00:00:00";
+        String untilDateExclusive = month.plusMonths(1).atDay(1).toString();
 
         List<HoaDonRow> result = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(SQL)) {
-            ps.setTimestamp(1, Timestamp.valueOf(from));
-            ps.setTimestamp(2, Timestamp.valueOf(untilExclusive));
+            ps.setString(1, from);
+            ps.setString(2, untilExclusive);
             ps.setString(3, month.toString()); // YYYY-MM
-            ps.setTimestamp(4, Timestamp.valueOf(from));
-            ps.setTimestamp(5, Timestamp.valueOf(untilExclusive));
-            ps.setTimestamp(6, Timestamp.valueOf(untilExclusive));
+            ps.setString(4, from);
+            ps.setString(5, untilExclusive);
+            ps.setString(6, untilDateExclusive);
             if (maSV == null || maSV.isBlank()) {
                 ps.setNull(7, Types.VARCHAR);
                 ps.setNull(8, Types.VARCHAR);

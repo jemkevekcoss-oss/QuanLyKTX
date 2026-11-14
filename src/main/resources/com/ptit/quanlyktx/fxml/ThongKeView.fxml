@@ -101,6 +101,47 @@
                     </StackPane>
                 </VBox>
             </Tab>
+            <Tab text="Top sinh viên sử dụng DV">
+                <VBox spacing="12" styleClass="tk-panel" VBox.vgrow="ALWAYS">
+                    <HBox alignment="CENTER_LEFT" spacing="12">
+                        <VBox spacing="4" HBox.hgrow="ALWAYS">
+                            <Label text="Top sinh viên sử dụng dịch vụ" styleClass="tk-panel-title"/>
+                            <Label text="Xếp hạng theo lượt hoặc chi phí thực tế trong tháng được tra cứu." styleClass="tk-hint"/>
+                        </VBox>
+                        <Label fx:id="lblTopKy" text="Tháng —" styleClass="tk-pill"/>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="18" styleClass="tk-ranking-filter">
+                        <VBox spacing="5">
+                            <Label text="Hiển thị" styleClass="tk-filter-label"/>
+                            <ComboBox fx:id="cboTopGioiHan" prefWidth="140" styleClass="tk-combo"/>
+                        </VBox>
+                        <VBox spacing="5">
+                            <Label text="Tiêu chí xếp hạng" styleClass="tk-filter-label"/>
+                            <ComboBox fx:id="cboTopTieuChi" prefWidth="230" styleClass="tk-combo"/>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label text="Dùng tháng thống kê ở phía trên" styleClass="tk-hint"/>
+                    </HBox>
+                    <Label fx:id="lblTopMoTa" text="Thống kê theo tháng đã chọn" styleClass="tk-chart-note"/>
+                    <TableView fx:id="tblTopSinhVien" prefHeight="390" VBox.vgrow="ALWAYS"
+                               styleClass="tk-table, tk-ranking-table">
+                        <columns>
+                            <TableColumn fx:id="colTopThuHang" text="Top" prefWidth="68"/>
+                            <TableColumn fx:id="colTopMaSv" text="Mã sinh viên" prefWidth="155"/>
+                            <TableColumn fx:id="colTopHoTen" text="Họ và tên" prefWidth="270"/>
+                            <TableColumn fx:id="colTopSoLuot" text="Số lượt" prefWidth="125"/>
+                            <TableColumn fx:id="colTopTongTien" text="Tổng tiền dịch vụ" prefWidth="175"/>
+                        </columns>
+                    </TableView>
+                    <HBox alignment="CENTER_LEFT" spacing="9" styleClass="tk-total">
+                        <Label fx:id="lblTopSoDong" text="Hiển thị 0 vị trí xếp hạng" styleClass="tk-hint"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label text="Tổng chi phí của nhóm:" styleClass="tk-hint"/>
+                        <Label fx:id="lblTopTongTien" text="0 đ" styleClass="tk-total-money"/>
+                    </HBox>
+                    <Label fx:id="lblTopTrangThai" text="" wrapText="true" styleClass="tk-chart-note"/>
+                </VBox>
+            </Tab>
         </tabs>
     </TabPane>
     <Label fx:id="lblTrangThai" text="" styleClass="tk-footer-status"/>

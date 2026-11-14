@@ -4,12 +4,20 @@ import com.ptit.quanlyktx.database.DatabaseConnection;
 import com.ptit.quanlyktx.dto.VeXeThangRow;
 
 import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
-/** Quản lý VE_XE_THANG, dùng bảng SINH_VIEN để hiển thị tên. */
+/** Quan ly ve thang SQLite; giu nguyen API cua GuiXeController. */
 public class VeXeThangDAO {
     public static final BigDecimal GIA_VE_THANG = new BigDecimal("100000.00");
     private static final DateTimeFormatter PREFIX_MONTH = DateTimeFormatter.ofPattern("yyMM");
@@ -26,33 +34,40 @@ public class VeXeThangDAO {
     }
 
     private VeXeThangRow readRow(ResultSet rs) throws SQLException {
-        // MySQL DATE -> LocalDate; vé cũ vẫn có thể có giá trị NULL.
-        java.sql.Date sqlDate = rs.getDate("ngay_dang_ky");
+        String rawDate = rs.getString("ngay_dang_ky");
+        LocalDate ngayDangKy = null;
+        if (rawDate != null && !rawDate.isBlank()) {
+            try {
+                ngayDangKy = LocalDate.parse(rawDate.substring(0, 10));
+            } catch (DateTimeParseException | IndexOutOfBoundsException ex) {
+                throw new SQLException("Ngay dang ky ve khong hop le: " + rawDate, ex);
+            }
+        }
         return new VeXeThangRow(
                 rs.getString("ma_ve_xe"), rs.getString("bien_so_xe"),
                 rs.getString("loai_xe"), rs.getString("ma_sv"),
                 rs.getString("ho_ten"), rs.getString("lop"), rs.getString("so_phong"),
-                rs.getString("thang_dang_ky"),
-                sqlDate == null ? null : sqlDate.toLocalDate(),
+                rs.getString("thang_dang_ky"), ngayDangKy,
                 rs.getBigDecimal("phi_hang_thang"));
     }
 
     public List<VeXeThangRow> findByMonth(YearMonth month) throws SQLException {
-        String sql = BASE + " WHERE v.thang_dang_ky = ? ORDER BY v.ma_ve_xe";
-        List<VeXeThangRow> result = new ArrayList<>();
+        String sql = BASE + " WHERE v.thang_dang_ky=? ORDER BY v.ma_ve_xe";
+        List<VeXeThangRow> rows = new ArrayList<>();
         try (Connection c = DatabaseConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, month.toString());
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) result.add(readRow(rs));
+                while (rs.next()) rows.add(readRow(rs));
             }
         }
-        return result;
+        return rows;
     }
 
     public VeXeThangRow findByPlate(String plate, YearMonth month) throws SQLException {
-        String sql = BASE + " WHERE UPPER(v.bien_so_xe) = UPPER(?) " +
-                "AND v.thang_dang_ky = ? ORDER BY v.ma_ve_xe LIMIT 1";
+        if (plate == null || month == null) return null;
+        String sql = BASE + " WHERE UPPER(v.bien_so_xe)=UPPER(?) "
+                + "AND v.thang_dang_ky=? ORDER BY v.ma_ve_xe LIMIT 1";
         try (Connection c = DatabaseConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, plate.trim());
@@ -66,7 +81,8 @@ public class VeXeThangDAO {
     public List<SinhVienRef> findStudents() throws SQLException {
         List<SinhVienRef> result = new ArrayList<>();
         try (Connection c = DatabaseConnection.getConnection();
-             PreparedStatement ps = c.prepareStatement("SELECT ma_sv, ho_ten FROM SINH_VIEN ORDER BY ma_sv");
+             PreparedStatement ps = c.prepareStatement(
+                     "SELECT ma_sv, ho_ten FROM SINH_VIEN ORDER BY ma_sv");
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) result.add(new SinhVienRef(rs.getString(1), rs.getString(2)));
         }
@@ -84,59 +100,60 @@ public class VeXeThangDAO {
         return result;
     }
 
-    /**
-     * Tự tạo mã VXyyMM_nn. GET_LOCK tuần tự hóa đăng ký tháng trên những kết nối
-     * cùng dùng ứng dụng; để bảo vệ tuyệt đối, DB vẫn cần UNIQUE theo (tháng, biển).
-     */
-    public String register(String plate, String type, String maSV, YearMonth month) throws SQLException {
-        plate = plate.trim().toUpperCase(Locale.ROOT);
-        type = type.trim();
+    /** Tao ma VXyyMM_nn, kiem tra gioi han 2 ve/thang va trung bien so. */
+    public String register(String plate, String type, String maSV, YearMonth month)
+            throws SQLException {
+        plate = normalizePlate(plate);
+        type = type == null ? "" : type.trim();
         validate(plate, type, maSV, month);
+        if (month.isBefore(YearMonth.now())) {
+            throw new SQLException("Khong the dang ky ve cho thang da qua: " + month);
+        }
         String prefix = "VX" + month.format(PREFIX_MONTH) + "_";
-        String lockName = "ktx_ve_" + month.toString();
         try (Connection c = DatabaseConnection.getConnection()) {
-            if (!acquireLock(c, lockName)) throw new SQLException("Hệ thống đang tạo mã vé. Hãy thử lại.");
+            // SQLite khong co GET_LOCK/FOR UPDATE. BEGIN IMMEDIATE khoa ghi
+            // TRUOC khi dem ve va tao ma, tranh hai lan dang ky trung nhau.
+            beginImmediate(c);
             try {
-                c.setAutoCommit(false);
-                try {
-                    lockStudent(c, maSV);
-                    ensureAllowed(c, plate, maSV, month, null);
-                    String code = nextCode(c, prefix);
-                    try (PreparedStatement ps = c.prepareStatement("""
-                            INSERT INTO VE_XE_THANG
-                            (ma_ve_xe, bien_so_xe, loai_xe, ma_sv, thang_dang_ky, ngay_dang_ky, phi_hang_thang)
-                            VALUES (?, ?, ?, ?, ?, CURRENT_DATE(), ?)
-                            """)) {
-                        ps.setString(1, code);
-                        ps.setString(2, plate);
-                        ps.setString(3, type);
-                        ps.setString(4, maSV);
-                        ps.setString(5, month.toString());
-                        ps.setBigDecimal(6, GIA_VE_THANG);
-                        ps.executeUpdate();
-                    }
-                    c.commit();
-                    return code;
-                } catch (SQLException | RuntimeException ex) {
-                    c.rollback();
-                    throw ex;
+                ensureStudentExists(c, maSV);
+                ensureAllowed(c, plate, maSV, month, null);
+                String code = nextCode(c, prefix);
+                try (PreparedStatement ps = c.prepareStatement("""
+                        INSERT INTO VE_XE_THANG
+                          (ma_ve_xe, bien_so_xe, loai_xe, ma_sv,
+                           thang_dang_ky, ngay_dang_ky, phi_hang_thang)
+                        VALUES (?, ?, ?, ?, ?, ?, ?)
+                        """)) {
+                    ps.setString(1, code);
+                    ps.setString(2, plate);
+                    ps.setString(3, type);
+                    ps.setString(4, maSV);
+                    ps.setString(5, month.toString());
+                    ps.setString(6, LocalDate.now().toString());
+                    ps.setBigDecimal(7, GIA_VE_THANG);
+                    ps.executeUpdate();
                 }
-            } finally { releaseLock(c, lockName); }
+                commit(c);
+                return code;
+            } catch (SQLException | RuntimeException ex) {
+                rollback(c, ex);
+                throw ex;
+            }
         }
     }
 
+    /** Ve da co luot gui xe thi khong thay doi thong tin de giu lich su. */
     public void edit(String ticketId, String plate, String type, String maSV, YearMonth month)
             throws SQLException {
-        plate = plate.trim().toUpperCase(Locale.ROOT);
-        type = type.trim();
+        plate = normalizePlate(plate);
+        type = type == null ? "" : type.trim();
         validate(plate, type, maSV, month);
         try (Connection c = DatabaseConnection.getConnection()) {
-            c.setAutoCommit(false);
+            beginImmediate(c);
             try {
-                // Đã có lượt gửi: không đổi chủ, biển số hay tháng để giữ lịch sử hóa đơn.
                 if (hasTrips(c, ticketId))
-                    throw new SQLException("Vé đã phát sinh lượt gửi. Không cho sửa thông tin lịch sử.");
-                lockStudent(c, maSV);
+                    throw new SQLException("Ve da phat sinh luot gui. Khong cho sua thong tin lich su.");
+                ensureStudentExists(c, maSV);
                 ensureAllowed(c, plate, maSV, month, ticketId);
                 try (PreparedStatement ps = c.prepareStatement("""
                         UPDATE VE_XE_THANG
@@ -149,44 +166,64 @@ public class VeXeThangDAO {
                     ps.setString(4, ticketId);
                     ps.setString(5, month.toString());
                     if (ps.executeUpdate() != 1)
-                        throw new SQLException("Không tìm thấy vé hoặc tháng đăng ký đã thay đổi.");
+                        throw new SQLException("Khong tim thay ve hoac thang dang ky da thay doi.");
                 }
-                c.commit();
-            } catch (SQLException | RuntimeException ex) { c.rollback(); throw ex; }
-        }
-    }
-
-    public void delete(String ticketId) throws SQLException {
-        try (Connection c = DatabaseConnection.getConnection()) {
-            if (hasTrips(c, ticketId))
-                throw new SQLException("Vé đã có lượt gửi/lấy xe nên không thể xóa.");
-            try (PreparedStatement ps = c.prepareStatement(
-                    "DELETE FROM VE_XE_THANG WHERE ma_ve_xe=?")) {
-                ps.setString(1, ticketId);
-                if (ps.executeUpdate() != 1) throw new SQLException("Vé không còn tồn tại.");
+                commit(c);
+            } catch (SQLException | RuntimeException ex) {
+                rollback(c, ex);
+                throw ex;
             }
         }
     }
 
+    /** Chan xoa ve co luot gui (SQLite schema co FK ON DELETE CASCADE). */
+    public void delete(String ticketId) throws SQLException {
+        try (Connection c = DatabaseConnection.getConnection()) {
+            beginImmediate(c);
+            try {
+                if (hasTrips(c, ticketId))
+                    throw new SQLException("Ve da co luot gui/lay xe nen khong the xoa.");
+                try (PreparedStatement ps = c.prepareStatement(
+                        "DELETE FROM VE_XE_THANG WHERE ma_ve_xe=?")) {
+                    ps.setString(1, ticketId);
+                    if (ps.executeUpdate() != 1)
+                        throw new SQLException("Ve khong con ton tai.");
+                }
+                commit(c);
+            } catch (SQLException | RuntimeException ex) {
+                rollback(c, ex);
+                throw ex;
+            }
+        }
+    }
+
+    /** Gia han bang ve MOI, khong ghi de ve cu va cac luot gui xe cu. */
     public String renew(VeXeThangRow old, YearMonth month) throws SQLException {
+        if (old == null || month == null)
+            throw new SQLException("Chua chon ve va thang can gia han.");
         if (!month.isAfter(YearMonth.parse(old.thangDangKy())))
-            throw new SQLException("Tháng gia hạn phải sau tháng đăng ký của vé cũ.");
+            throw new SQLException("Thang gia han phai sau thang dang ky cua ve cu.");
         return register(old.bienSoXe(), old.loaiXe(), old.maSV(), month);
     }
 
-    private void validate(String plate, String type, String maSV, YearMonth month) throws SQLException {
-        if (plate.isBlank() || type.isBlank() || maSV == null || maSV.isBlank() || month == null)
-            throw new SQLException("Hãy nhập đủ biển số, loại xe, sinh viên và tháng.");
-        if (plate.length() > 20 || type.length() > 50 || maSV.length() > 20)
-            throw new SQLException("Dữ liệu vượt độ dài quy định trong CSDL.");
+    private String normalizePlate(String plate) {
+        return plate == null ? "" : plate.trim().toUpperCase(Locale.ROOT);
     }
 
-    private void lockStudent(Connection c, String maSV) throws SQLException {
+    private void validate(String plate, String type, String maSV, YearMonth month)
+            throws SQLException {
+        if (plate.isBlank() || type.isBlank() || maSV == null || maSV.isBlank() || month == null)
+            throw new SQLException("Hay nhap du bien so, loai xe, sinh vien va thang.");
+        if (plate.length() > 20 || type.length() > 50 || maSV.length() > 20)
+            throw new SQLException("Du lieu vuot do dai quy dinh trong CSDL.");
+    }
+
+    private void ensureStudentExists(Connection c, String maSV) throws SQLException {
         try (PreparedStatement ps = c.prepareStatement(
-                "SELECT ma_sv FROM SINH_VIEN WHERE ma_sv=? FOR UPDATE")) {
+                "SELECT 1 FROM SINH_VIEN WHERE ma_sv=? LIMIT 1")) {
             ps.setString(1, maSV);
             try (ResultSet rs = ps.executeQuery()) {
-                if (!rs.next()) throw new SQLException("Không tìm thấy sinh viên " + maSV);
+                if (!rs.next()) throw new SQLException("Khong tim thay sinh vien " + maSV);
             }
         }
     }
@@ -195,7 +232,7 @@ public class VeXeThangDAO {
                                YearMonth month, String exceptId) throws SQLException {
         String except = exceptId == null ? "" : exceptId;
         try (PreparedStatement ps = c.prepareStatement("""
-                SELECT COUNT(*) AS n FROM VE_XE_THANG
+                SELECT COUNT(*) FROM VE_XE_THANG
                 WHERE ma_sv=? AND thang_dang_ky=? AND ma_ve_xe<>?
                 """)) {
             ps.setString(1, maSV);
@@ -204,35 +241,36 @@ public class VeXeThangDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 rs.next();
                 if (rs.getInt(1) >= 2)
-                    throw new SQLException("Sinh viên đã có 2 vé tháng " + month + ". Không được đăng ký thêm.");
+                    throw new SQLException("Sinh vien da co 2 ve thang " + month + ".");
             }
         }
         try (PreparedStatement ps = c.prepareStatement("""
-                SELECT COUNT(*) FROM VE_XE_THANG
-                WHERE UPPER(bien_so_xe)=UPPER(?) AND thang_dang_ky=? AND ma_ve_xe<>?
+                SELECT 1 FROM VE_XE_THANG
+                WHERE UPPER(bien_so_xe)=UPPER(?) AND thang_dang_ky=?
+                  AND ma_ve_xe<>? LIMIT 1
                 """)) {
             ps.setString(1, plate);
             ps.setString(2, month.toString());
             ps.setString(3, except);
             try (ResultSet rs = ps.executeQuery()) {
-                rs.next();
-                if (rs.getInt(1) > 0)
-                    throw new SQLException("Biển số đã có vé trong tháng " + month + ".");
+                if (rs.next()) throw new SQLException("Bien so da co ve trong thang " + month + ".");
             }
         }
     }
 
     private String nextCode(Connection c, String prefix) throws SQLException {
+        // VX2611_ la 7 ky tu; phan so bat dau tai vi tri 8.
         try (PreparedStatement ps = c.prepareStatement("""
-                SELECT COALESCE(MAX(CAST(SUBSTRING(ma_ve_xe, 8) AS UNSIGNED)), 0)
-                FROM VE_XE_THANG WHERE LEFT(ma_ve_xe, 7)=?
+                SELECT COALESCE(MAX(CAST(SUBSTR(ma_ve_xe, 8) AS INTEGER)), 0)
+                FROM VE_XE_THANG WHERE SUBSTR(ma_ve_xe, 1, 7)=?
                 """)) {
             ps.setString(1, prefix);
             try (ResultSet rs = ps.executeQuery()) {
                 rs.next();
                 int next = rs.getInt(1) + 1;
                 String code = prefix + String.format(Locale.ROOT, "%02d", next);
-                if (code.length() > 20) throw new SQLException("Mã vé đã vượt giới hạn VARCHAR(20).");
+                if (code.length() > 20)
+                    throw new SQLException("Ma ve da vuot gioi han 20 ky tu.");
                 return code;
             }
         }
@@ -246,17 +284,14 @@ public class VeXeThangDAO {
         }
     }
 
-    private boolean acquireLock(Connection c, String key) throws SQLException {
-        try (PreparedStatement ps = c.prepareStatement("SELECT GET_LOCK(?, 5)")) {
-            ps.setString(1, key);
-            try (ResultSet rs = ps.executeQuery()) { return rs.next() && rs.getInt(1) == 1; }
-        }
+    // Transaction quan ly bang SQL: khong goi c.commit() khi JDBC autoCommit=true.
+    private static void beginImmediate(Connection c) throws SQLException { executeTx(c, "BEGIN IMMEDIATE"); }
+    private static void commit(Connection c) throws SQLException { executeTx(c, "COMMIT"); }
+    private static void executeTx(Connection c, String command) throws SQLException {
+        try (Statement s = c.createStatement()) { s.execute(command); }
     }
-
-    private void releaseLock(Connection c, String key) throws SQLException {
-        try (PreparedStatement ps = c.prepareStatement("SELECT RELEASE_LOCK(?)")) {
-            ps.setString(1, key);
-            ps.executeQuery().close();
-        }
+    private static void rollback(Connection c, Throwable original) {
+        try { executeTx(c, "ROLLBACK"); }
+        catch (SQLException ex) { original.addSuppressed(ex); }
     }
 }

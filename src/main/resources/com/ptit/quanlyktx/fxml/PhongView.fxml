@@ -15,7 +15,7 @@
       stylesheets="@../css/phong.css"
       styleClass="room-page" spacing="12" fillWidth="true">
 
-    <!-- Ba thẻ thống kê, tính trực tiếp từ dữ liệu MySQL -->
+    <!-- Ba thẻ thống kê, tính trực tiếp từ cơ sở dữ liệu -->
     <HBox spacing="12" fillHeight="true">
         <VBox spacing="5" styleClass="room-stat-card"
               HBox.hgrow="ALWAYS" maxWidth="1.7976931348623157E308">
@@ -63,7 +63,7 @@
         <Label fx:id="lblRoomCount" text="Hiển thị: 0 phòng" styleClass="room-count"/>
     </VBox>
 
-    <!-- Danh sách SV theo phòng đang chọn, liên kết dữ liệu thực MySQL -->
+    <!-- Danh sách SV theo phòng đang chọn, liên kết dữ liệu thực trong cơ sở dữ liệu -->
     <VBox spacing="10" styleClass="room-panel">
         <HBox alignment="CENTER_LEFT">
             <VBox spacing="4" HBox.hgrow="ALWAYS">
