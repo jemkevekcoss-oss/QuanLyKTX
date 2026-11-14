@@ -4,7 +4,7 @@
 
 **ỨNG DỤNG QUẢN LÝ KÝ TÚC XÁ SINH VIÊN**
 
-`v1.0.0` · `Java 26` · `JavaFX 27` · `SQLite` · `Windows`
+`v1.0.0` · `Java 26` · `JavaFX 27` · `MySQL` · `SQLite` · `Windows`
 
 </div>
 
