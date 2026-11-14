@@ -649,7 +649,7 @@ public class GuiXeController {
             lblValidity.getStyleClass().add("parking-status-neutral");
             lblVehicleType.setText("—"); lblVehicleId.setText("—");
             lblFreeCount.setText("— / 2");
-            lblGateHint.setText("Xe không có vé tháng: không ghi vào LUOT_GUI_XE theo đề bài.");
+            lblGateHint.setText("Tra cứu biển số để kiểm tra vé tháng và thực hiện gửi/lấy xe.");
             btnCheckIn.setDisable(true); btnCheckOut.setDisable(true);
             return;
         }
@@ -674,7 +674,7 @@ public class GuiXeController {
                     ? "Xe đang trong bãi. Hãy xác nhận lấy trước khi gửi tiếp."
                     : (!coHieuLuc
                         ? "Vé chưa có hiệu lực hôm nay. Không thể ghi nhận gửi mới."
-                        : "Xe chưa gửi. Từ lượt thứ 3 trong ngày sẽ có phí phát sinh 3.000đ."));
+                        : "Xe chưa được gửi. Từ lượt gửi thứ 3 trong ngày, phí phát sinh là 3.000đ/lượt."));
         } catch (SQLException ex) {
             lblFreeCount.setText("— / 2");
             lblGateHint.setText("Chưa đọc được số lượt trong ngày.");

@@ -449,7 +449,7 @@ public class DichVuController {
                     .filter(n -> n != null).reduce(BigDecimal.ZERO, BigDecimal::add);
             lblReportCount.setText("Kết quả: " + reports.size() + " dòng (theo sinh viên và dịch vụ)");
             lblReportTotal.setText("Tổng cộng: " + money(total));
-        } catch (SQLException ex) { sqlError("Không thực hiện được truy vấn 2", ex); }
+        } catch (SQLException ex) { sqlError("Không thực hiện được truy vấn", ex); }
     }
     @FXML private void handleNavigateRevenue() {
         if (onNavigate != null) onNavigate.accept("reports");

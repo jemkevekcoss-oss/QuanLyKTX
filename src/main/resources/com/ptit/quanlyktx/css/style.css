@@ -37,7 +37,7 @@
 .nav-button-active:hover { -fx-background-color: #1D4ED8; }
 .main-content { -fx-background-color: #F4F7FB; }
 .eyebrow { -fx-text-fill: #64748B; -fx-font-size: 11px; -fx-font-weight: bold; }
-.page-title { -fx-text-fill: #14263D; -fx-font-size: 27px; -fx-font-weight: bold; }
+.page-title { -fx-text-fill: #14263D; -fx-font-size: 32px; -fx-font-weight: bold; }
 .user-label { -fx-background-color: white; -fx-background-radius: 18; -fx-padding: 10 15; -fx-text-fill: #334155; }
 .stat-card, .content-panel { -fx-background-color: white; -fx-background-radius: 12; -fx-padding: 24; -fx-border-color: #E2E8F0; -fx-border-radius: 12; }
 .card-label { -fx-text-fill: #64748B; -fx-font-size: 13px; }

@@ -107,7 +107,7 @@
             <Tab fx:id="tabReport" text="Thống kê sử dụng dịch vụ">
                 <content>
                     <VBox spacing="13" styleClass="svc-panel" fillWidth="true">
-                        <Label text="Truy vấn 2 – Tổng hợp chi phí sử dụng dịch vụ" styleClass="svc-panel-title"/>
+                        <Label text="Tổng hợp chi phí sử dụng dịch vụ" styleClass="svc-panel-title"/>
                         <Label text="Liệt kê sinh viên và tổng chi phí từng dịch vụ trong khoảng thời gian được chọn."
                                styleClass="svc-footnote"/>
                         <HBox spacing="10" alignment="BOTTOM_LEFT">

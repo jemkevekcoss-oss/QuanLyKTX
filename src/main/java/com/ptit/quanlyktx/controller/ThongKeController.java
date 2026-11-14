@@ -183,7 +183,7 @@ public class ThongKeController {
             tblDoanhThu.getSortOrder().clear();
             capNhatThongSo();
             capNhatBieuDo();
-            lblTrangThai.setText("Đã tải dữ liệu từ SQLite cho tháng " + thang);
+            lblTrangThai.setText("Đã tải dữ liệu cho tháng " + thang);
             // Truy vấn độc lập: lỗi ở bảng Top không làm mất dữ liệu 2 tab cũ.
             capNhatTopSinhVien();
         } catch (SQLException ex) {
@@ -327,7 +327,7 @@ public class ThongKeController {
             lblTopTongTien.setText(formatTien(tongTienTop));
             lblTopTrangThai.setText(rows.isEmpty()
                     ? "Không có giao dịch dịch vụ trong tháng được chọn."
-                    : "Mỗi lượt tương ứng một lần ghi nhận sử dụng dịch vụ; chi phí lấy từ giao dịch đã lưu.");
+                    : "Thống kê những sinh viên có lượt sử dụng hoặc chi phí dịch vụ cao nhất tháng.");
         } catch (SQLException ex) {
             // Lỗi riêng của truy vấn mới không làm thay đổi dữ liệu bảng/biểu đồ cũ.
             tblTopSinhVien.getItems().clear();
