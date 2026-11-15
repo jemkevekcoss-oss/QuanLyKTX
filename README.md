@@ -240,7 +240,7 @@ Dự án ban đầu sử dụng MySQL trong quá trình phát triển; **phiên 
 
 **Lưu ý:** Giữ nguyên các tệp và thư mục đi kèm chương trình khi giải nén. Bản .exe hiện tại chỉ dành cho Windows; chưa có gói cài đặt riêng cho macOS hoặc Linux.
 
-**Liên kết tải:** xem mục **Releases** ở phía bên phải trang repository trên GitHub. *(Có thể thay dòng này bằng URL cụ thể của bản phát hành khi hoàn tất đăng tải.)*
+**Liên kết tải:** xem mục **Releases** ở phía bên phải trang repository trên GitHub.
 
 ---
 
