@@ -348,10 +348,23 @@ public class SinhVienController {
         cancelButton.getStyleClass().add("sv-dialog-cancel");
         saveButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
             String validation = validate(current, ma, cmt, ten, sinh, lop, que, phong, vao);
+
+            // Khi SỬA: kiểm tra phòng đích trước khi đóng form.
+            // Không đổi phòng => không chặn sửa các thông tin khác.
+            if (validation == null && editing) {
+                try {
+                    validation = sinhVienDAO.validateRoomChange(
+                            current.getMaSV(), phong.getText().trim());
+                } catch (SQLException e) {
+                    System.err.println("[SinhVien - Check room] " + e.getMessage());
+                    validation = "Không thể kiểm tra sức chứa phòng. Vui lòng thử lại.";
+                }
+            }
+
             if (validation != null) {
                 error.setText(validation);
                 error.setVisible(true);
-                event.consume();
+                event.consume(); // Không đóng form, giữ nguyên phòng cũ.
             } else {
                 error.setVisible(false);
             }

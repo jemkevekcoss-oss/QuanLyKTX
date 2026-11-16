@@ -70,7 +70,55 @@ public class SinhVienDAO {
         }
         
     } 
-    //UPDATE
+    /**
+     * Kiểm tra phòng đích khi chuyển sinh viên. Trả null nếu hợp lệ,
+     * ngược lại trả về thông báo để Controller hiển thị ngay trong form.
+     */
+    public String validateRoomChange(String maSV, String soPhongMoi) throws SQLException {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            return validateRoomChange(conn, maSV, soPhongMoi);
+        }
+    }
+
+    private String validateRoomChange(Connection conn, String maSV, String soPhongMoi)
+            throws SQLException {
+        final String sql = """
+            SELECT sv.so_phong AS phong_hien_tai,
+                   p.so_nguoi_toi_da AS suc_chua,
+                   (SELECT COUNT(*) FROM SINH_VIEN s
+                    WHERE s.so_phong = p.so_phong) AS dang_o
+            FROM SINH_VIEN sv
+            LEFT JOIN PHONG p ON p.so_phong = ?
+            WHERE sv.ma_sv = ?
+            """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, soPhongMoi);
+            ps.setString(2, maSV);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) {
+                    return "Không tìm thấy hồ sơ sinh viên cần cập nhật.";
+                }
+                if (soPhongMoi.equals(rs.getString("phong_hien_tai"))) {
+                    return null; // Sửa thông tin nhưng không chuyển phòng.
+                }
+                if (rs.getObject("suc_chua") == null) {
+                    return "Phòng " + soPhongMoi + " không tồn tại. Vui lòng chọn phòng hợp lệ.";
+                }
+                int dangO = rs.getInt("dang_o");
+                int sucChua = rs.getInt("suc_chua");
+                if (dangO >= sucChua) {
+                    return "Phòng " + soPhongMoi + " đã đủ sức chứa ("
+                            + dangO + "/" + sucChua
+                            + " sinh viên). Vui lòng chọn phòng khác.";
+                }
+            }
+        }
+        return null;
+    }
+
+    // UPDATE: điều kiện sức chứa nằm trong chính câu SQL để không ghi sai
+    // ngay cả khi dữ liệu thay đổi sau bước kiểm tra trên giao diện.
     public boolean update(SinhVien sv) throws SQLException {
         String sql = """
             UPDATE SINH_VIEN
@@ -82,6 +130,15 @@ public class SinhVienDAO {
                 so_phong = ?,
                 ngay_vao_o = ?
             WHERE ma_sv = ?
+              AND (
+                  so_phong = ?
+                  OR EXISTS (
+                      SELECT 1 FROM PHONG p
+                      WHERE p.so_phong = ?
+                        AND (SELECT COUNT(*) FROM SINH_VIEN s
+                             WHERE s.so_phong = p.so_phong) < p.so_nguoi_toi_da
+                  )
+              )
             """;
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -95,8 +152,18 @@ public class SinhVienDAO {
             ps.setString(6, sv.getSoPhong());
             ps.setString(7, sv.getNgayVaoO().toString());
             ps.setString(8, sv.getMaSV());
+            ps.setString(9, sv.getSoPhong());
+            ps.setString(10, sv.getSoPhong());
 
-            return ps.executeUpdate() == 1;
+            if (ps.executeUpdate() == 1) {
+                return true;
+            }
+            // Phân biệt phòng đầy với trường hợp hồ sơ không còn tồn tại.
+            String reason = validateRoomChange(conn, sv.getMaSV(), sv.getSoPhong());
+            if (reason != null) {
+                throw new SQLException(reason, "45000");
+            }
+            return false;
         }
     }   
     //DELETE

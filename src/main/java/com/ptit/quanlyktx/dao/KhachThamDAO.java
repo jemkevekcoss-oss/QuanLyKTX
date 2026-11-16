@@ -2,6 +2,7 @@ package com.ptit.quanlyktx.dao;
 
 import com.ptit.quanlyktx.database.DatabaseConnection;
 import com.ptit.quanlyktx.dto.KhachRow;
+import com.ptit.quanlyktx.model.KhachTham;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -22,17 +23,42 @@ public class KhachThamDAO {
         try (Connection c = DatabaseConnection.getConnection();
              PreparedStatement p = c.prepareStatement(sql);
              ResultSet r = p.executeQuery()) {
+
             while (r.next()) {
-                // SQLite luu DATE duoi dang chuoi YYYY-MM-DD.
+                // Đọc dữ liệu ngày sinh
                 String ngay = r.getString("ngay_sinh");
                 LocalDate ngaySinh = (ngay == null || ngay.isBlank())
                         ? null : LocalDate.parse(ngay);
-                items.add(new KhachRow(
+
+                // Bước 1: ResultSet -> Model
+                KhachTham khach = new KhachTham(
                         r.getInt("id_khach"),
                         r.getString("so_cmt"),
                         r.getString("ho_ten"),
-                        ngaySinh));
+                        ngaySinh
+                );
+
+                // Bước 2: Model -> DTO
+                items.add(new KhachRow(
+                        khach.getIdKhach(),
+                        khach.getSoCmt(),
+                        khach.getHoTen(),
+                        khach.getNgaySinh()
+                ));
             }
+//            Có thể lược gọn:
+//            while (r.next()) {
+//                // SQLite luu DATE duoi dang chuoi YYYY-MM-DD.
+//                String ngay = r.getString("ngay_sinh");
+//                LocalDate ngaySinh = (ngay == null || ngay.isBlank())
+//                        ? null : LocalDate.parse(ngay);
+//                items.add(new KhachRow(
+//                        r.getInt("id_khach"),
+//                        r.getString("so_cmt"),
+//                        r.getString("ho_ten"),
+//                        ngaySinh));
+//            }
+  
         }
         return items;
     }

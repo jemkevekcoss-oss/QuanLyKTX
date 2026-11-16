@@ -2,6 +2,7 @@ package com.ptit.quanlyktx.dao;
 
 import com.ptit.quanlyktx.database.DatabaseConnection;
 import com.ptit.quanlyktx.dto.LuotDenThamRow;
+import com.ptit.quanlyktx.model.LuotDenTham;
 import com.ptit.quanlyktx.dto.SinhVienOption;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -35,18 +36,57 @@ public class LuotDenThamDAO {
         try (Connection c = DatabaseConnection.getConnection();
              PreparedStatement p = c.prepareStatement(sql);
              ResultSet r = p.executeQuery()) {
-            while (r.next()) {
-                items.add(new LuotDenThamRow(
-                        r.getInt("id_luot"),
-                        r.getInt("id_khach"),
-                        r.getString("ten_khach"),
-                        r.getString("so_cmt"),
-                        r.getString("ma_sv"),
-                        r.getString("ten_sv"),
-                        LocalDate.parse(r.getString("ngay_den_choi")),
-                        readDateTime(r.getString("thoi_gian_den")),
-                        readDateTime(r.getString("thoi_gian_di"))));
-            }
+            
+        while (r.next()) {
+
+            // BƯỚC 1: ResultSet -> Model (9 thuộc tính)
+            LuotDenTham luot = new LuotDenTham();
+
+            luot.setIdLuot(r.getInt("id_luot"));
+            luot.setIdKhach(r.getInt("id_khach"));
+            luot.setTenKhach(r.getString("ten_khach"));
+            luot.setSoCmt(r.getString("so_cmt"));
+            luot.setMaSV(r.getString("ma_sv"));
+            luot.setTenSV(r.getString("ten_sv"));
+
+            luot.setNgayDenChoi(
+                LocalDate.parse(r.getString("ngay_den_choi"))
+            );
+
+            luot.setThoiGianDen(
+                readDateTime(r.getString("thoi_gian_den"))
+            );
+
+            luot.setThoiGianDi(
+                readDateTime(r.getString("thoi_gian_di"))
+            );
+
+            // BƯỚC 2: Model -> DTO
+            items.add(new LuotDenThamRow(
+                luot.getIdLuot(),
+                luot.getIdKhach(),
+                luot.getTenKhach(),
+                luot.getSoCmt(),
+                luot.getMaSv(),
+                luot.getTenSv(),
+                luot.getNgayDenChoi(),
+                luot.getThoiGianDen(),
+                luot.getThoiGianDi()
+            ));
+        }          
+//            Có thể lược gọn:
+//            while (r.next()) {
+//                items.add(new LuotDenThamRow(
+//                        r.getInt("id_luot"),
+//                        r.getInt("id_khach"),
+//                        r.getString("ten_khach"),
+//                        r.getString("so_cmt"),
+//                        r.getString("ma_sv"),
+//                        r.getString("ten_sv"),
+//                        LocalDate.parse(r.getString("ngay_den_choi")),
+//                        readDateTime(r.getString("thoi_gian_den")),
+//                        readDateTime(r.getString("thoi_gian_di"))));
+//            }
         }
         return items;
     }
